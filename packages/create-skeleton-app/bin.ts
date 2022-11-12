@@ -1,10 +1,11 @@
-import { SkelOptions } from './index';
+import { SkelOptions } from './creator';
 import fs from 'fs';
 import mri from 'mri';
 import prompts from 'prompts';
 import { bold, cyan, gray, green, red } from 'kleur/colors';
-import { createSkeleton } from './index.js';
+import { createSkeleton } from './creator.js';
 import { dist } from './utils.js';
+
 
 async function main() {
 	await createSkeleton(await askForMissingParams(await parseArgs()));
@@ -14,7 +15,7 @@ async function parseArgs() {
 	//Raw grab of args from command line
 	const argv = process.argv.slice(2);
 
-	// mri will parse them and expand any shorthand args.  Accepted args are the literal props of InstallOptions
+	// mri will parse them and expand any shorthand args.  Accepted args are the literal props of SkelOptions
 	const args: SkelOptions = mri(argv, {
 		alias: {
 			h: 'help',
