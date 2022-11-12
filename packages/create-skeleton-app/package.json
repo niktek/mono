@@ -8,13 +8,16 @@
 	"main": "dist/bin.js",
 	"type": "module",
 	"files": [
-		"dist"
+		"dist/*",
+		"package.json",
+		"templates/*"
 	],
 	"bin": {
 		"cre": "dist/bin.js"
 	},
 	"scripts": {
-		"build": "tsc -p .",
+		"build": "tsc --incremental",
+		"start" : "node dist/bin.js",
 		"clean": "tsc --build --clean"
 	},
 	"devDependencies": {

@@ -1,6 +1,6 @@
 // Types
 import { create } from 'create-svelte';
-import { Options } from 'create-svelte/types/internal'
+import { Options } from 'create-svelte/types/internal';
 import process from 'process';
 
 export type SkelOptions = Options & {
@@ -11,7 +11,16 @@ export type SkelOptions = Options & {
 	name: string;
 	twplugins: Array<'forms' | 'typography' | 'line-clamp' | 'aspect-ratio' | null>;
 	theme: Array<
-		'skeleton' | 'modern' | 'hamlindigo' | 'rocket' | 'sahara' | 'gold-nouveau' | ' vintage' | 'seafoam' | 'crimson'>;
+		| 'skeleton'
+		| 'modern'
+		| 'hamlindigo'
+		| 'rocket'
+		| 'sahara'
+		| 'gold-nouveau'
+		| ' vintage'
+		| 'seafoam'
+		| 'crimson'
+	>;
 	skeletontemplate: string;
 	templatePath: string;
 	skeleton: boolean;
@@ -25,4 +34,17 @@ export function createSkeleton(opts: SkelOptions) {
 	create(opts.path, opts);
 	process.chdir(opts.path);
 	console.log(process.cwd());
+}
+
+function createTailwindConfig(opts: SkelOptions) {
+	let str = `/** @type {import('tailwindcss').Config} */
+module.exports = {
+	require('path').join(require.resolve('@brainandbones/skeleton'), '../**/*.{html,js,svelte,ts}')
+	darkMode: 'class',
+	theme: {
+		extend: {}
+	},
+	plugins: [require('@brainandbones/skeleton/tailwind/theme.cjs')]
+};`;
+	return str;
 }

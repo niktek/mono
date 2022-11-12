@@ -3,8 +3,8 @@ import fs from 'fs';
 import mri from 'mri';
 import prompts from 'prompts';
 import { bold, cyan, gray, green, red } from 'kleur/colors';
-import { createSkeleton } from './creator';
-import { dist } from './utils';
+import { createSkeleton } from './index.js';
+import { dist } from './utils.js';
 
 async function main() {
 	await createSkeleton(await askForMissingParams(await parseArgs()));
@@ -45,7 +45,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 `;
 
 	const { version } = JSON.parse(
-		fs.readFileSync(new URL('package.json', import.meta.url), 'utf-8')
+		fs.readFileSync(new URL('../package.json', import.meta.url), 'utf-8')
 	);
 
 	if (!args.noprompt) {
@@ -176,8 +176,8 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 			type: 'select',
 			name: 'template',
 			message: 'Which Skeleton app template?',
-			choices: fs.readdirSync(dist('templates')).map((dir) => {
-				const meta_file = dist(`templates/${dir}/meta.json`);
+			choices: fs.readdirSync(dist('../templates')).map((dir) => {
+				const meta_file = dist(`../templates/${dir}/meta.json`);
 				const { title, description } = JSON.parse(fs.readFileSync(meta_file, 'utf8'));
 				return {
 					title,
@@ -193,10 +193,16 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 
 	//Map some values for compat with what svelte-add's create expects.  Not that the skeleton references below
 	//have nothing to do with SkeletonUI, but rather Svelte's internal naming for their starter templates.
-	if (args.framework == 'svelte-kit') { args.template = 'skeleton' }
-	if (args.framework == 'svelte-kit-lib') { args.template = 'skeletonlib' }
+	if (args.framework == 'svelte-kit') {
+		args.template = 'skeleton';
+	}
+	if (args.framework == 'svelte-kit-lib') {
+		args.template = 'skeletonlib';
+	}
 	// We don't ask for path, but it may have been passed in as an arg
-	if (args.path == undefined) {args.path = ''}
+	if (args.path == undefined) {
+		args.path = '';
+	}
 	args.path += args.name.replace(/\s+/g, '-').toLowerCase();
 	return args;
 }
