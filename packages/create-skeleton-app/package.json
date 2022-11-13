@@ -13,7 +13,7 @@
 		"templates/*"
 	],
 	"bin": {
-		"cre": "dist/bin.js"
+		"skel": "dist/bin.js"
 	},
 	"scripts": {
 		"build": "tsc --incremental",

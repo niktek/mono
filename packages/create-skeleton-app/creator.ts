@@ -15,8 +15,7 @@ export type SkelOptions = Options & {
 	path: string;
 	name: string;
 	twplugins: Array<'forms' | 'typography' | 'line-clamp' | 'aspect-ratio' |  null> | 'none';
-	theme: Array<
-		| 'skeleton'
+	theme: 'skeleton'
 		| 'modern'
 		| 'hamlindigo'
 		| 'rocket'
@@ -25,7 +24,7 @@ export type SkelOptions = Options & {
 		| 'vintage'
 		| 'seafoam'
 		| 'crimson'
-	>;
+	;
 	skeletontemplate: string;
 	templatePath: string;
 	skeletonui: boolean;
@@ -71,7 +70,10 @@ export function createSkeleton(opts: SkelOptions) {
 
 	// copy over selected template
 	copyTemplate(opts);
-	console.log('Done');
+
+	if (!opts.quiet) {
+		console.log('Done');
+	}
 	process.exit();
 }
 

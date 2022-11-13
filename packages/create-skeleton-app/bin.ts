@@ -5,6 +5,7 @@ import prompts from 'prompts';
 import { bold, cyan, gray, green, red } from 'kleur/colors';
 import { createSkeleton } from './creator.js';
 import { dist } from './utils.js';
+import { openStdin } from 'process';
 
 
 async function main() {
@@ -36,9 +37,18 @@ async function parseArgs() {
 	return args;
 }
 
-async function askForMissingParams(args: SkelOptions) {
+async function askForMissingParams(opts: SkelOptions) {
 	// If --quiet is passed, we check if we have the minimum required info to proceed and set sane defaults for everything else
-
+	if (opts.quiet) {
+		if (!opts.name) opts.name = 'new-site'
+		if (!opts.types) opts.types = 'typescript'
+		if (!opts.eslint) opts.eslint = true;
+		if (!opts.prettier) opts.prettier = true;
+		if (!opts.playwright) opts.playwright = false;
+		if (!opts.template) opts.template = 'skeleton'; //This is SK's skeleton template, nothing to do with us
+		if (!opts.theme) opts.theme = 'skeleton';
+		if (!opts.skeletontemplate) opts.skeletontemplate = 'bare';
+	}
 
 	// prettier-ignore
 	const disclaimer = `
@@ -53,7 +63,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 		fs.readFileSync(new URL('../package.json', import.meta.url), 'utf-8')
 	);
 
-	if (!args.quiet) {
+	if (!opts.quiet) {
 		console.log(gray(`\ncreate-skeleton-ui version ${version}`));
 		console.log(disclaimer);
 	}
@@ -62,12 +72,12 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	let questions = new Array();
 
 	// Package name
-	if (!args?.name) {
+	if (!opts?.name) {
 		questions.push({ type: 'text', name: 'name', message: 'Name for your new project:' });
 	}
 
 	// Framework Selection
-	if (!args?.framework) {
+	if (!opts?.framework) {
 		const q = {
 			type: 'select',
 			name: 'framework',
@@ -82,7 +92,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 		questions.push(q);
 	}
 
-	if (!args?.types) {
+	if (!opts?.types) {
 		const q = {
 			type: 'select',
 			name: 'types',
@@ -102,7 +112,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 		};
 		questions.push(q);
 	}
-	if (!args?.eslint) {
+	if (!opts?.eslint) {
 		const q = {
 			type: 'toggle',
 			name: 'eslint',
@@ -114,7 +124,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 		questions.push(q);
 	}
 
-	if (!args?.prettier) {
+	if (!opts?.prettier) {
 		const q = {
 			type: 'toggle',
 			name: 'prettier',
@@ -126,7 +136,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 		questions.push(q);
 	}
 
-	if (!args.playwright) {
+	if (!opts.playwright) {
 		const q = {
 			type: 'toggle',
 			name: 'playwright',
@@ -138,7 +148,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 		questions.push(q);
 	}
 	// Tailwind Plugin Selection
-	if (!args?.quiet && !args?.twplugins) {
+	if (!opts?.quiet && !opts?.twplugins) {
 		const q = {
 			type: 'multiselect',
 			name: 'twplugins',
@@ -154,7 +164,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	}
 
 	// Skeleton Theme Selection
-	if (!args?.theme) {
+	if (!opts?.theme) {
 		const q = {
 			type: 'select',
 			name: 'theme',
@@ -176,39 +186,44 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	}
 
 	//Skeleton Template Selection
-	if (!args?.skeletontemplate) {
+	if (!opts?.skeletontemplate) {
 		const q = {
 			type: 'select',
 			name: 'skeletontemplate',
 			message: 'Which Skeleton app template?',
 			choices: fs.readdirSync(dist('../templates')).map((dir) => {
 				const meta_file = dist(`../templates/${dir}/meta.json`);
-				const { title, description } = JSON.parse(fs.readFileSync(meta_file, 'utf8'));
+				const { position, title, description } = JSON.parse(fs.readFileSync(meta_file, 'utf8'));
 				return {
+					position,
 					title,
 					description,
 					value: dir
 				};
-			})
+			}).sort((a,b) => (a.position - b.position))
 		};
 		questions.push(q);
 	}
-	const response = await prompts(questions);
-	Object.keys(response).forEach((prop) => (args[prop] = response[prop]));
+	const onCancel = (prompt) => {
+		console.log('Exiting');
+		process.exit();
+	};
+	const response = await prompts(questions, {onCancel});
+	Object.keys(response).forEach((prop) => (opts[prop] = response[prop]));
 
 	//Map some values for compat with what svelte-add's create expects.  Not that the skeleton references below
 	//have nothing to do with SkeletonUI, but rather Svelte's internal naming for their starter templates.
-	if (args.framework == 'svelte-kit') {
-		args.template = 'skeleton';
+	if (opts.framework == 'svelte-kit') {
+		opts.template = 'skeleton';
 	}
-	if (args.framework == 'svelte-kit-lib') {
-		args.template = 'skeletonlib';
+	if (opts.framework == 'svelte-kit-lib') {
+		opts.template = 'skeletonlib';
 	}
 	// We don't ask for path, but it may have been passed in as an arg
-	if (args.path == undefined) {
-		args.path = '';
+	if (opts.path == undefined) {
+		opts.path = '';
 	}
-	args.path += args.name.replace(/\s+/g, '-').toLowerCase();
-	return args;
+	opts.path += opts.name.replace(/\s+/g, '-').toLowerCase();
+	return opts;
 }
 main();
