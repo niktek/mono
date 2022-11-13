@@ -3,17 +3,18 @@ import { create } from 'create-svelte';
 import { Options } from 'create-svelte/types/internal';
 import whichPMRuns from 'which-pm-runs';
 import process from 'process';
-import { spawn } from 'node:child_process';
-import { writeFile } from 'node:fs';
-import { Buffer } from 'node:buffer';
+import { spawnSync } from 'node:child_process';
+import fs from 'fs-extra';
+import path, { join } from 'path';
+import { dist } from './utils.js';
 
 export type SkelOptions = Options & {
 	help: boolean;
-	noprompt: boolean;
+	quiet: boolean;
 	framework: 'svelte-kit-lib' | 'svelte-kit' | 'vite' | 'astro';
 	path: string;
 	name: string;
-	twplugins: Array<'forms' | 'typography' | 'line-clamp' | 'aspect-ratio' | null>;
+	twplugins: Array<'forms' | 'typography' | 'line-clamp' | 'aspect-ratio' |  null> | 'none';
 	theme: Array<
 		| 'skeleton'
 		| 'modern'
@@ -27,7 +28,7 @@ export type SkelOptions = Options & {
 	>;
 	skeletontemplate: string;
 	templatePath: string;
-	skeleton: boolean;
+	skeletonui: boolean;
 	monorepo: boolean;
 	packages: string[];
 	workspace: string;
@@ -48,16 +49,30 @@ export function createSkeleton(opts: SkelOptions) {
 		'svelte-preprocess',
 		'@brainandbones/skeleton'
 	];
-	if (opts.twplugins != null) {
+	
+	if (opts.twplugins != null && opts.twplugins != 'none' ) {
 		opts.twplugins.map((val) => installParams.push('@tailwindcss/' + val));
 	}
-	const pm = spawn(whichPMRuns().name, installParams, { cwd: process.cwd() });
+
+	if (!opts.quiet) {
+		console.log('Working..');
+	}
+
+	spawnSync(whichPMRuns().name, installParams);
 
 	// write out config files
 	out('svelte.config.js', createSvelteConfig());
 	out('tailwind.config.cjs', createTailwindConfig(opts));
 	out('postcss.config.cjs', createPostCssConfig());
+	if (opts.framework == 'svelte-kit' || opts.framework == 'svelte-kit-lib') {
+		out(path.resolve(process.cwd(), 'src/routes/', '+layout.svelte'), createSvelteKitLayout(opts));
+		out(path.resolve(process.cwd(), 'src/', 'app.postcss'), '/*place global styles here */');
+	}
+
+	// copy over selected template
+	copyTemplate(opts);
 	console.log('Done');
+	process.exit();
 }
 
 function createSvelteConfig() {
@@ -68,6 +83,12 @@ import preprocess from "svelte-preprocess";
 const config = {
 	kit: {
 		adapter: adapter()
+	},
+	vitePlugin: {
+		emitCss: false,
+	},
+	compilerOptions: {
+		css: "injected",
 	},
 	preprocess: [
 		preprocess({
@@ -82,9 +103,10 @@ export default config;
 }
 
 function createTailwindConfig(opts: SkelOptions) {
+	
 	let plugins = [`require('@brainandbones/skeleton/tailwind/theme.cjs')`];
-	if (opts.twplugins != null) {
-		opts.twplugins.map((val) => plugins.push(`require('@tailwindcss/'${val}')`));
+	if (opts.twplugins != null && opts.twplugins != 'none') {
+		opts.twplugins.map((val) => plugins.push(`require('@tailwindcss/${val}')`));
 	}
 	let str = `/** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -109,8 +131,29 @@ function createPostCssConfig() {
 	return str;
 }
 
+function createSvelteKitLayout(opts: SkelOptions) {
+	let str = `<script>
+	import '@brainandbones/skeleton/themes/theme-${opts.theme}.css';
+	import '@brainandbones/skeleton/styles/all.css';
+	import '../app.postcss';
+</script>
+<slot/>`;
+	return str;
+}
+
+function copyTemplate(opts: SkelOptions) {
+	let src = path.resolve(dist('../templates/'), opts.skeletontemplate + '/');
+	const filterFunc = (src, dest) => {
+		return true;
+	};
+
+	fs.copySync(src, './src/', { filter: filterFunc, overwrite: true });
+	// patch back in their theme choice - it may have been replaced by the theme template, it may still be the correct auto-genned one, depends on the template - we don't care, this fixes it.
+	let content = fs.readFileSync('./src/routes/+layout.svelte', {encoding:'utf8', flag:'r'});
+	const reg = /theme-.*\.css';$/gim
+	fs.writeFileSync('./src/routes/+layout.svelte',content.replace(reg, `theme-${opts.theme}.css';`));
+}
+
 function out(filename: string, data: string) {
-	writeFile(filename, new Uint8Array(Buffer.from(data)), () =>
-		console.log(`Error writing ${filename}`)
-	);
+	fs.writeFileSync(filename, data);
 }

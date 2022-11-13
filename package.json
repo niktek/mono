@@ -5,7 +5,8 @@
 	"type": "module",
 	"scripts": {
 		"dev": "pnpm --stream -r dev",
-		"build": "pnpm --stream -r run build"
+		"build": "pnpm --stream -r run build",
+		"sk": "./scripts/sk.sh"
 	},
 	"devDependencies": {
 		"@types/minimist": "^1.2.2",

@@ -23,9 +23,10 @@ async function parseArgs() {
 			n: 'name',
 			p: 'path',
 			t: 'theme',
-			m: 'monorepo'
+			m: 'monorepo',
+			q: 'quiet'
 		},
-		boolean: ['help', 'noprompt', 'monorepo', 'skeleton']
+		boolean: ['help', 'quiet', 'monorepo', 'skeletonui']
 	});
 
 	// Show help if specified regardless of how many other options are specified
@@ -36,6 +37,9 @@ async function parseArgs() {
 }
 
 async function askForMissingParams(args: SkelOptions) {
+	// If --quiet is passed, we check if we have the minimum required info to proceed and set sane defaults for everything else
+
+
 	// prettier-ignore
 	const disclaimer = `
 ${bold(cyan('Welcome to 💀 SkeletonUI!'))}
@@ -49,7 +53,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 		fs.readFileSync(new URL('../package.json', import.meta.url), 'utf-8')
 	);
 
-	if (!args.noprompt) {
+	if (!args.quiet) {
 		console.log(gray(`\ncreate-skeleton-ui version ${version}`));
 		console.log(disclaimer);
 	}
@@ -134,7 +138,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 		questions.push(q);
 	}
 	// Tailwind Plugin Selection
-	if (!args?.noprompt && !args?.twplugins) {
+	if (!args?.quiet && !args?.twplugins) {
 		const q = {
 			type: 'multiselect',
 			name: 'twplugins',
@@ -172,10 +176,10 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	}
 
 	//Skeleton Template Selection
-	if (!args?.template) {
+	if (!args?.skeletontemplate) {
 		const q = {
 			type: 'select',
-			name: 'template',
+			name: 'skeletontemplate',
 			message: 'Which Skeleton app template?',
 			choices: fs.readdirSync(dist('../templates')).map((dir) => {
 				const meta_file = dist(`../templates/${dir}/meta.json`);
