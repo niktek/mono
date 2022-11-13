@@ -1,11 +1,9 @@
-import { SkelOptions } from './creator';
-import fs from 'fs';
+import { SkelOptions, createSkeleton } from './creator';
+import fs from 'fs-extra';
 import mri from 'mri';
 import prompts from 'prompts';
-import { bold, cyan, gray, green, red } from 'kleur/colors';
-import { createSkeleton } from './creator.js';
-import { dist } from './utils.js';
-import { openStdin } from 'process';
+import { bold, cyan, gray, red } from 'kleur/colors';
+import { dist } from './utils';
 
 
 async function main() {
@@ -72,7 +70,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	}
 
 	// From here we ask for any missing InstallOptions, unless noprompt is set, in which case we ask for mandatory ones only
-	let questions = new Array();
+	const questions = [];
 
 	// Package name
 	if (!opts?.name) {
@@ -207,7 +205,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 		};
 		questions.push(q);
 	}
-	const onCancel = (prompt) => {
+	const onCancel = () => {
 		console.log('Exiting');
 		process.exit();
 	};

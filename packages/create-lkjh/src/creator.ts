@@ -5,7 +5,7 @@ import whichPMRuns from 'which-pm-runs';
 import process from 'process';
 import { spawnSync } from 'node:child_process';
 import fs from 'fs-extra';
-import path, { join } from 'path';
+import path from 'path';
 import { dist } from './utils.js';
 
 export type SkelOptions = Options & {
@@ -45,7 +45,7 @@ export function createSkeleton(opts: SkelOptions) {
 	process.chdir(opts.path);
 
 	// install packages
-	let installParams = [
+	const installParams = [
 		'i',
 		'-D',
 		'tailwindcss',
@@ -80,7 +80,7 @@ export function createSkeleton(opts: SkelOptions) {
 }
 
 function createSvelteConfig() {
-	let str = `import adapter from '@sveltejs/adapter-auto';
+	const str = `import adapter from '@sveltejs/adapter-auto';
 import preprocess from "svelte-preprocess";
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -107,13 +107,15 @@ export default config;
 }
 
 function createTailwindConfig(opts: SkelOptions) {
-	let plugins = [`require('@brainandbones/skeleton/tailwind/theme.cjs')`];
+	const plugins = [`require('@brainandbones/skeleton/tailwind/theme.cjs')`];
 	if (opts.twplugins != null && opts.twplugins != 'none') {
 		opts.twplugins.map((val) => plugins.push(`require('@tailwindcss/${val}')`));
 	}
-	let str = `/** @type {import('tailwindcss').Config} */
+	const aspectRatio = (opts.twplugins.includes('aspect-ratio')) ? `
+	corePlugins: { aspectRatio: false }, ` : '';
+	const str = `/** @type {import('tailwindcss').Config} */
 module.exports = {
-	darkMode: 'class',
+	darkMode: 'class',${aspectRatio}
 	content: ['./src/**/*.{html,js,svelte,ts}', require('path').join(require.resolve('@brainandbones/skeleton'), '../**/*.{html,js,svelte,ts}')],
 	theme: {
 		extend: {},
@@ -125,7 +127,7 @@ module.exports = {
 }
 
 function createPostCssConfig() {
-	let str = `module.exports = {
+	const str = `module.exports = {
 	plugins: {
 		tailwindcss: {},
 		autoprefixer: {},
@@ -135,7 +137,7 @@ function createPostCssConfig() {
 }
 
 function createSvelteKitLayout(opts: SkelOptions) {
-	let str = `<script>
+	const str = `<script>
 	import '@brainandbones/skeleton/themes/theme-${opts.theme}.css';
 	import '@brainandbones/skeleton/styles/all.css';
 	import '../app.postcss';
@@ -145,14 +147,10 @@ function createSvelteKitLayout(opts: SkelOptions) {
 }
 
 function copyTemplate(opts: SkelOptions) {
-	let src = path.resolve(dist('../templates/'), opts.skeletontemplate + '/');
-	const filterFunc = (src, dest) => {
-		return true;
-	};
-
-	fs.copySync(src, './src/', { filter: filterFunc, overwrite: true });
+	const src = path.resolve(dist('../templates/'), opts.skeletontemplate + '/');
+	fs.copySync(src, './src/', { overwrite: true });
 	// patch back in their theme choice - it may have been replaced by the theme template, it may still be the correct auto-genned one, depends on the template - we don't care, this fixes it.
-	let content = fs.readFileSync('./src/routes/+layout.svelte', { encoding: 'utf8', flag: 'r' });
+	const content = fs.readFileSync('./src/routes/+layout.svelte', { encoding: 'utf8', flag: 'r' });
 	const reg = /theme-.*\.css';$/gim;
 	fs.writeFileSync(
 		'./src/routes/+layout.svelte',
