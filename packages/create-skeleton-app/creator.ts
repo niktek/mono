@@ -14,8 +14,9 @@ export type SkelOptions = Options & {
 	framework: 'svelte-kit-lib' | 'svelte-kit' | 'vite' | 'astro';
 	path: string;
 	name: string;
-	twplugins: Array<'forms' | 'typography' | 'line-clamp' | 'aspect-ratio' |  null> | 'none';
-	theme: 'skeleton'
+	twplugins: Array<'forms' | 'typography' | 'line-clamp' | 'aspect-ratio' | null> | 'none';
+	theme:
+		| 'skeleton'
 		| 'modern'
 		| 'hamlindigo'
 		| 'rocket'
@@ -23,8 +24,7 @@ export type SkelOptions = Options & {
 		| 'gold-nouveau'
 		| 'vintage'
 		| 'seafoam'
-		| 'crimson'
-	;
+		| 'crimson';
 	skeletontemplate: string;
 	templatePath: string;
 	skeletonui: boolean;
@@ -34,6 +34,12 @@ export type SkelOptions = Options & {
 };
 
 export function createSkeleton(opts: SkelOptions) {
+	//create-svelte will happily overwrite an existing directory, foot guns are bad mkay
+	if (fs.existsSync(opts.path)) {
+		console.log('Install directory already exists!');
+		return;
+	}
+
 	//create-svelte will build the base install for us
 	create(opts.path, opts);
 	process.chdir(opts.path);
@@ -48,8 +54,8 @@ export function createSkeleton(opts: SkelOptions) {
 		'svelte-preprocess',
 		'@brainandbones/skeleton'
 	];
-	
-	if (opts.twplugins != null && opts.twplugins != 'none' ) {
+
+	if (opts.twplugins != null && opts.twplugins != 'none') {
 		opts.twplugins.map((val) => installParams.push('@tailwindcss/' + val));
 	}
 
@@ -70,11 +76,7 @@ export function createSkeleton(opts: SkelOptions) {
 
 	// copy over selected template
 	copyTemplate(opts);
-
-	if (!opts.quiet) {
-		console.log('Done');
-	}
-	process.exit();
+	return opts;
 }
 
 function createSvelteConfig() {
@@ -105,7 +107,6 @@ export default config;
 }
 
 function createTailwindConfig(opts: SkelOptions) {
-	
 	let plugins = [`require('@brainandbones/skeleton/tailwind/theme.cjs')`];
 	if (opts.twplugins != null && opts.twplugins != 'none') {
 		opts.twplugins.map((val) => plugins.push(`require('@tailwindcss/${val}')`));
@@ -151,9 +152,12 @@ function copyTemplate(opts: SkelOptions) {
 
 	fs.copySync(src, './src/', { filter: filterFunc, overwrite: true });
 	// patch back in their theme choice - it may have been replaced by the theme template, it may still be the correct auto-genned one, depends on the template - we don't care, this fixes it.
-	let content = fs.readFileSync('./src/routes/+layout.svelte', {encoding:'utf8', flag:'r'});
-	const reg = /theme-.*\.css';$/gim
-	fs.writeFileSync('./src/routes/+layout.svelte',content.replace(reg, `theme-${opts.theme}.css';`));
+	let content = fs.readFileSync('./src/routes/+layout.svelte', { encoding: 'utf8', flag: 'r' });
+	const reg = /theme-.*\.css';$/gim;
+	fs.writeFileSync(
+		'./src/routes/+layout.svelte',
+		content.replace(reg, `theme-${opts.theme}.css';`)
+	);
 }
 
 function out(filename: string, data: string) {

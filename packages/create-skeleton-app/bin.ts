@@ -9,11 +9,14 @@ import { openStdin } from 'process';
 
 
 async function main() {
-	await createSkeleton(await askForMissingParams(await parseArgs()));
+	const opts = await createSkeleton(await askForMissingParams(await parseArgs()));
+	if (!opts.quiet) {
+		console.log('Done');
+	}
+	process.exit();
 }
 
 async function parseArgs() {
-	//Raw grab of args from command line
 	const argv = process.argv.slice(2);
 
 	// mri will parse them and expand any shorthand args.  Accepted args are the literal props of SkelOptions
@@ -37,7 +40,7 @@ async function parseArgs() {
 	return args;
 }
 
-async function askForMissingParams(opts: SkelOptions) {
+export async function askForMissingParams(opts: SkelOptions) {
 	// If --quiet is passed, we check if we have the minimum required info to proceed and set sane defaults for everything else
 	if (opts.quiet) {
 		if (!opts.name) opts.name = 'new-site'
