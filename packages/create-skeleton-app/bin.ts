@@ -33,9 +33,9 @@ async function parseArgs() {
 		boolean: ['help', 'quiet', 'monorepo', 'skeletonui']
 	});
 
-	// Show help if specified regardless of how many other options are specified
+	// Show help if specified regardless of how many other options are specified, this is not automatic from mri or prompts :(
 	if (args?.help) {
-		console.log('show help');
+		console.log(`coming once it's all agreed upon`);
 	}
 	return args;
 }
