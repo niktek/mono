@@ -1,6 +1,6 @@
 {
 	"name": "create-lkjh",
-	"version": "0.1.9",
+	"version": "0.1.10",
 	"description": "Creates Skeleton UI apps on top of Svelte Kit, Vite (Svelte) and Astro",
 	"keywords": [],
 	"author": "niktek <nik@niktek.io>",
@@ -13,12 +13,10 @@
 			"require": "./dist/index.cjs"
 		}
 	},
-	"main": "./dist/index.cjs",
-	"bin": "./dist/bin.cjs",
-	"module": "./dist/index.mjs",
-	"types": "./dist/index.d.ts",
+	"main": "./src/bin.js",
+	"bin": "./src/bin.js",
 	"files": [
-		"dist/*",
+		"src/*",
 		"package.json",
 		"templates/*"
 	],
