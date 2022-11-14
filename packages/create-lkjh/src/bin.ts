@@ -8,7 +8,7 @@ import { dist } from './utils';
 
 async function main() {
 	const opts = await createSkeleton(await askForMissingParams(await parseArgs()));
-	if (!opts.quiet) {
+	if (!opts?.quiet) {
 		console.log('Done');
 	}
 	process.exit();
@@ -17,7 +17,7 @@ async function main() {
 async function parseArgs() {
 	const argv = process.argv.slice(2);
 
-	// mri will parse them and expand any shorthand args.  Accepted args are the literal props of SkelOptions
+	// mri will parse argv and expand any shorthand args.  Accepted args are the literal props of SkelOptions
 	const args: SkelOptions = mri(argv, {
 		alias: {
 			h: 'help',
