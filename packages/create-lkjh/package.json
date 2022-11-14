@@ -1,6 +1,6 @@
 {
 	"name": "create-lkjh",
-	"version": "0.1.14-beta.4",
+	"version": "0.1.14-beta.5",
 	"description": "Creates Skeleton UI apps on top of Svelte Kit, Vite (Svelte) and Astro",
 	"keywords": [],
 	"author": "niktek <nik@niktek.io>",
@@ -27,7 +27,7 @@
 	"scripts": {
 		"prepublishOnly": "npm run build",
 		"dev": "esno src/bin.ts",
-		"build": "unbuild",
+		"build": "unbuild && esno scripts/copyassets.ts",
 		"stub": "unbuild --stub",
 		"release": "bumpp && npm publish",
 		"lint": "eslint ."
