@@ -122,6 +122,7 @@ Problems? Open an issue on ${cyan(
 		};
 		questions.push(q);
 	}
+
 	if (!opts?.eslint) {
 		const q = {
 			type: 'toggle',
@@ -157,6 +158,7 @@ Problems? Open an issue on ${cyan(
 		};
 		questions.push(q);
 	}
+
 	// Tailwind Plugin Selection
 	if (!opts?.quiet && !opts?.twplugins) {
 		const q = {
@@ -217,6 +219,7 @@ Problems? Open an issue on ${cyan(
 		};
 		questions.push(q);
 	}
+	
 	const onCancel = () => {
 		console.log('Exiting');
 		process.exit();
