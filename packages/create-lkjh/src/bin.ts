@@ -13,9 +13,10 @@ async function main() {
 		if (opts.packagemanager == 'npm') {
 			runString = 'npm run dev'
 		}
-		console.log(`Done! You can now:
+		const finalInstructions = `Done! You can now:
 cd ${opts.path}
-${runString}`);
+${runString}`;
+		console.log(bold(cyan(finalInstructions)));
 	}
 	process.exit();
 }
@@ -166,7 +167,7 @@ Problems? Open an issue on ${cyan(
 				{ title: 'forms', value: 'forms' },
 				{ title: 'typography', value: 'typography' },
 				{ title: 'line-clamp', value: 'line-clamp' },
-				//{ title: 'aspect-ratio', value: 'aspect-ratio' } this doesn't seem to actually work even following their instructions
+				{ title: 'aspect-ratio', value: 'aspect-ratio' }
 			]
 		};
 		questions.push(q);
