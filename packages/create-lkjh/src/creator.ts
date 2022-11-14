@@ -1,12 +1,20 @@
 // Types
 import { create } from 'create-svelte';
-import { Options } from 'create-svelte/types/internal';
 import whichPMRuns from 'which-pm-runs';
 import process from 'process';
 import { spawnSync } from 'node:child_process';
 import fs from 'fs-extra';
 import path from 'path';
 import { dist } from './utils.js';
+
+export type Options = {
+	name: string;
+	template: 'default' | 'skeleton' | 'skeletonlib';
+	types: 'typescript' | 'checkjs' | null;
+	prettier: boolean;
+	eslint: boolean;
+	playwright: boolean;
+};
 
 export type SkelOptions = Options & {
 	help: boolean;
@@ -31,6 +39,7 @@ export type SkelOptions = Options & {
 	monorepo: boolean;
 	packages: string[];
 	workspace: string;
+	packagemanager: string;
 };
 
 export function createSkeleton(opts: SkelOptions) {
@@ -62,8 +71,13 @@ export function createSkeleton(opts: SkelOptions) {
 	if (!opts.quiet) {
 		console.log('Working..');
 	}
-
-	spawnSync(whichPMRuns().name, installParams);
+	const pm = whichPMRuns();
+	if (pm != undefined) {
+		opts.packagemanager = pm.name
+	} else {
+		opts.packagemanager = 'npm'
+	}
+	spawnSync(opts.packagemanager , installParams);
 
 	// write out config files
 	out('svelte.config.js', createSvelteConfig());

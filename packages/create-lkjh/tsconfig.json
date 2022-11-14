@@ -1,16 +1,16 @@
 {
 	"compilerOptions": {
-		"noImplicitAny": false,
-		"noEmitOnError": true,
-		"removeComments": false,
-		"esModuleInterop":true,
-		"declaration": true,
-		"sourceMap": true,
+		"target": "es2017",
+		"module": "esnext",
+		"lib": [
+			"esnext"
+		],
+		"moduleResolution": "node",
+		"esModuleInterop": true,
 		"strict": false,
-		"outDir": "dist",
-		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "Node"
-	},
-	"include": ["src"]
+		"strictNullChecks": false,
+		"resolveJsonModule": true,
+		"allowJs": true,
+		"noEmit": true
+	}
 }

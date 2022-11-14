@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { SkelOptions, createSkeleton } from './creator';
 import fs from 'fs-extra';
 import mri from 'mri';
@@ -5,11 +6,16 @@ import prompts from 'prompts';
 import { bold, cyan, gray, red } from 'kleur/colors';
 import { dist } from './utils';
 
-
 async function main() {
 	const opts = await createSkeleton(await askForMissingParams(await parseArgs()));
 	if (!opts?.quiet) {
-		console.log('Done');
+		let runString = `${opts.packagemanager} dev`
+		if (opts.packagemanager == 'npm') {
+			runString = 'npm run dev'
+		}
+		console.log(`Done! You can now:
+cd ${opts.path}
+${runString}`);
 	}
 	process.exit();
 }
@@ -41,8 +47,8 @@ async function parseArgs() {
 export async function askForMissingParams(opts: SkelOptions) {
 	// If --quiet is passed, we check if we have the minimum required info to proceed and set sane defaults for everything else
 	if (opts.quiet) {
-		if (!opts.name) opts.name = 'new-site'
-		if (!opts.types) opts.types = 'typescript'
+		if (!opts.name) opts.name = 'new-site';
+		if (!opts.types) opts.types = 'typescript';
 		if (!opts.eslint) opts.eslint = true;
 		if (!opts.prettier) opts.prettier = true;
 		if (!opts.playwright) opts.playwright = false;
@@ -53,11 +59,13 @@ export async function askForMissingParams(opts: SkelOptions) {
 
 	// prettier-ignore
 	const disclaimer = `
-${bold(cyan('Welcome to 💀 SkeletonUI!'))}
+${bold(cyan('Welcome to Skeleton 💀! A UI tookit for Svelte + Tailwind'))}
 
 ${bold(red('This is BETA software; expect bugs and missing features.'))}
 
-Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issues')} if none exists already.
+Problems? Open an issue on ${cyan(
+		'https://github.com/skeletonlabs/skeleton/issues'
+	)} if none exists already.
 `;
 
 	const { version } = JSON.parse(
@@ -65,7 +73,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	);
 
 	if (!opts.quiet) {
-		console.log(gray(`\ncreate-skeleton-ui version ${version}`));
+		console.log(gray(`\ncreate-skeleton-app version ${version}`));
 		console.log(disclaimer);
 	}
 
@@ -158,7 +166,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 				{ title: 'forms', value: 'forms' },
 				{ title: 'typography', value: 'typography' },
 				{ title: 'line-clamp', value: 'line-clamp' },
-				{ title: 'aspect-ratio', value: 'aspect-ratio' }
+				//{ title: 'aspect-ratio', value: 'aspect-ratio' } this doesn't seem to actually work even following their instructions
 			]
 		};
 		questions.push(q);
@@ -192,16 +200,19 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 			type: 'select',
 			name: 'skeletontemplate',
 			message: 'Which Skeleton app template?',
-			choices: fs.readdirSync(dist('../templates')).map((dir) => {
-				const meta_file = dist(`../templates/${dir}/meta.json`);
-				const { position, title, description } = JSON.parse(fs.readFileSync(meta_file, 'utf8'));
-				return {
-					position,
-					title,
-					description,
-					value: dir
-				};
-			}).sort((a,b) => (a.position - b.position))
+			choices: fs
+				.readdirSync(dist('../templates'))
+				.map((dir) => {
+					const meta_file = dist(`../templates/${dir}/meta.json`);
+					const { position, title, description } = JSON.parse(fs.readFileSync(meta_file, 'utf8'));
+					return {
+						position,
+						title,
+						description,
+						value: dir
+					};
+				})
+				.sort((a, b) => a.position - b.position)
 		};
 		questions.push(q);
 	}
@@ -209,7 +220,9 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 		console.log('Exiting');
 		process.exit();
 	};
-	const response = await prompts(questions, {onCancel});
+
+	// ts-ignore
+	const response = await prompts(questions, { onCancel });
 	Object.keys(response).forEach((prop) => (opts[prop] = response[prop]));
 
 	//Map some values for compat with what svelte-add's create expects.  Not that the skeleton references below
