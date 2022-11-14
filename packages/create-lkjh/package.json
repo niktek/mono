@@ -1,6 +1,6 @@
 {
 	"name": "create-lkjh",
-	"version": "0.1.7",
+	"version": "0.1.8",
 	"description": "Creates Skeleton UI apps on top of Svelte Kit, Vite (Svelte) and Astro",
 	"keywords": [],
 	"author": "niktek <nik@niktek.io>",
@@ -31,6 +31,7 @@
 		"test": "pnpm lint && vitest run --coverage"
 	},
 	"devDependencies": {
+		"@types/fs-extra": "^9.0.13",
 		"@types/prompts": "^2.4.1",
 		"@vitest/coverage-c8": "^0.24.3",
 		"eslint": "^8.25.0",
