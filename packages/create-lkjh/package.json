@@ -1,6 +1,6 @@
 {
 	"name": "create-lkjh",
-	"version": "0.1.14-beta.9",
+	"version": "0.1.14-beta.10",
 	"description": "Creates Skeleton UI apps on top of Svelte Kit, Vite (Svelte) and Astro",
 	"keywords": [],
 	"author": "niktek <nik@niktek.io>",
@@ -26,8 +26,8 @@
 	],
 	"scripts": {
 		"prepublishOnly": "npm run build",
-		"dev": "esno src/bin.ts",
-		"build": "unbuild && esno scripts/copyassets.ts",
+		"dev": "tsx src/bin.ts",
+		"build": "unbuild && tsx scripts/copyassets.ts",
 		"stub": "unbuild --stub",
 		"release": "bumpp && npm publish",
 		"lint": "eslint ."
@@ -36,20 +36,19 @@
 		"@types/fs-extra": "^9.0.13",
 		"@types/prompts": "^2.4.1",
 		"@types/which-pm-runs": "^1.0.0",
-		"@vitest/coverage-c8": "^0.24.3",
+		"@vitest/coverage-c8": "^0.24.5",
 		"bumpp": "^8.2.1",
-		"eslint": "^8.25.0",
-		"esno": "^0.16.3",
+		"create-svelte": "2.0.0-next.190",
+		"eslint": "^8.27.0",
 		"fs-extra": "^10.1.0",
 		"kleur": "^4.1.5",
 		"mri": "^1.2.0",
+		"ora": "^6.1.2",
 		"prompts": "^2.4.2",
 		"standard-version": "^9.5.0",
-		"typescript": "^4.8.4",
+		"tsx": "^3.11.0",
+		"typescript": "^4.9.3",
 		"unbuild": "^0.9.4",
 		"which-pm-runs": "^1.1.0"
-	},
-	"dependencies": {
-		"create-svelte": "2.0.0-next.190"
 	}
 }
