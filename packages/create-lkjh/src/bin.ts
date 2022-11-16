@@ -1,20 +1,35 @@
 #!/usr/bin/env node
-import { SkelOptions, createSkeleton } from './creator';
+import { SkeletonOptions, createSkeleton } from './creator';
 import fs from 'fs-extra';
 import mri from 'mri';
 import prompts from 'prompts';
 import { bold, cyan, gray, red } from 'kleur/colors';
-import { dist } from './utils';
+import { dist, getHelpText } from './utils';
+import path from 'path';
 
 async function main() {
-	const opts = await createSkeleton(await askForMissingParams(await parseArgs()));
-	if (!opts?.quiet) {
-		let runString = `${opts.packagemanager} dev`
+	let opts: SkeletonOptions = await parseArgs();
+
+	if ('quiet' in opts) {
+		// take the passed args and map them over the default vals of the class and then update opts with the merged options
+		let defaults = new SkeletonOptions();
+		opts = Object.assign(defaults, opts);
+	} else {
+		// We take the values provided (if any) and ask the user to fill in the rest
+		opts = await askForMissingParams(opts);
+	}
+
+	// Now that we have all of the options, lets go build it.
+	await createSkeleton(opts);
+
+	if (!('quiet' in opts)) {
+		let runString = `${opts.packagemanager} dev`;
 		if (opts.packagemanager == 'npm') {
-			runString = 'npm run dev'
+			runString = 'npm run dev';
 		}
-		const finalInstructions = `Done! You can now:
-cd ${opts.path}
+		const finalInstructions = `
+Done! You can now:
+cd ${path.relative(process.cwd() + '/..', opts.path)}
 ${runString}`;
 		console.log(bold(cyan(finalInstructions)));
 	}
@@ -25,84 +40,71 @@ async function parseArgs() {
 	const argv = process.argv.slice(2);
 
 	// mri will parse argv and expand any shorthand args.  Accepted args are the literal props of SkelOptions
-	const args: SkelOptions = mri(argv, {
+	const opts: SkeletonOptions = mri(argv, {
 		alias: {
 			h: 'help',
 			f: 'framework',
 			n: 'name',
 			p: 'path',
-			t: 'theme',
+			t: 'skeletontheme',
 			m: 'monorepo',
 			q: 'quiet'
 		},
-		boolean: ['help', 'quiet', 'monorepo', 'skeletonui']
+		boolean: ['help', 'quiet', 'monorepo', 'skeletonui', 'prettier', 'eslint', 'playwright']
 	});
 
-	// Show help if specified regardless of how many other options are specified, this is not automatic from mri or prompts :(
-	if (args?.help) {
-		console.log(`coming once it's all agreed upon`);
+	// Show help if specified regardless of how many other options are specified, have fun updating the text string :(
+	if ('help' in opts) {
+		console.log(getHelpText());
+		process.exit();
 	}
-	return args;
+	return opts;
 }
 
-export async function askForMissingParams(opts: SkelOptions) {
-	// If --quiet is passed, we check if we have the minimum required info to proceed and set sane defaults for everything else
-	if (opts.quiet) {
-		if (!opts.name) opts.name = 'new-site';
-		if (!opts.types) opts.types = 'typescript';
-		if (!opts.eslint) opts.eslint = true;
-		if (!opts.prettier) opts.prettier = true;
-		if (!opts.playwright) opts.playwright = false;
-		if (!opts.template) opts.template = 'skeleton'; //This is SK's skeleton template, nothing to do with us
-		if (!opts.theme) opts.theme = 'skeleton';
-		if (!opts.skeletontemplate) opts.skeletontemplate = 'bare';
-	}
-
+export async function askForMissingParams(opts: SkeletonOptions) {
 	// prettier-ignore
 	const disclaimer = `
 ${bold(cyan('Welcome to Skeleton 💀! A UI tookit for Svelte + Tailwind'))}
 
 ${bold(red('This is BETA software; expect bugs and missing features.'))}
 
-Problems? Open an issue on ${cyan(
-		'https://github.com/skeletonlabs/skeleton/issues'
-	)} if none exists already.
+Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issues')} if none exists already.
 `;
 
 	const { version } = JSON.parse(
 		fs.readFileSync(new URL('../package.json', import.meta.url), 'utf-8')
 	);
 
-	if (!opts.quiet) {
-		console.log(gray(`\ncreate-skeleton-app version ${version}`));
-		console.log(disclaimer);
-	}
+	console.log(gray(`\ncreate-skeleton-app version ${version}`));
+	console.log(disclaimer);
 
-	// From here we ask for any missing InstallOptions, unless noprompt is set, in which case we ask for mandatory ones only
+	if (!('path' in opts)) opts.path = ''; // When in interactive mode, we do not ask for a path, but respect any that have been supplied.
+
 	const questions = [];
+	//NOTE: When doing checks here, make sure to test for the presence of the prop, not the prop value as it may be set to false deliberately.
 
 	// Package name
-	if (!opts?.name) {
+	if (!('name' in opts)) {
 		questions.push({ type: 'text', name: 'name', message: 'Name for your new project:' });
 	}
 
 	// Framework Selection
-	if (!opts?.framework) {
+	if (!('framework' in opts)) {
 		const q = {
 			type: 'select',
 			name: 'framework',
 			message: 'Select what framework you wish to use:',
 			choices: [
 				{ title: 'Svelte Kit', value: 'svelte-kit' },
-				{ title: 'Svelte Kit Library', value: 'svelte-kit-lib' },
-				{ title: 'Vite (Svelte)', value: 'vite' },
-				{ title: 'Astro', value: 'astro' }
+				{ title: 'Svelte Kit Library', value: 'svelte-kit-lib' }
+				// { title: 'Vite (Svelte)', value: 'vite' },
+				// { title: 'Astro', value: 'astro' }
 			]
 		};
 		questions.push(q);
 	}
 
-	if (!opts?.types) {
+	if (!('types' in opts)) {
 		const q = {
 			type: 'select',
 			name: 'types',
@@ -123,7 +125,7 @@ Problems? Open an issue on ${cyan(
 		questions.push(q);
 	}
 
-	if (!opts?.eslint) {
+	if (!('eslint' in opts)) {
 		const q = {
 			type: 'toggle',
 			name: 'eslint',
@@ -135,7 +137,7 @@ Problems? Open an issue on ${cyan(
 		questions.push(q);
 	}
 
-	if (!opts?.prettier) {
+	if (!('prettier' in opts)) {
 		const q = {
 			type: 'toggle',
 			name: 'prettier',
@@ -147,7 +149,7 @@ Problems? Open an issue on ${cyan(
 		questions.push(q);
 	}
 
-	if (!opts.playwright) {
+	if (!('playwright' in opts)) {
 		const q = {
 			type: 'toggle',
 			name: 'playwright',
@@ -160,7 +162,7 @@ Problems? Open an issue on ${cyan(
 	}
 
 	// Tailwind Plugin Selection
-	if (!opts?.quiet && !opts?.twplugins) {
+	if (!('twplugins' in opts)) {
 		const q = {
 			type: 'multiselect',
 			name: 'twplugins',
@@ -176,7 +178,7 @@ Problems? Open an issue on ${cyan(
 	}
 
 	// Skeleton Theme Selection
-	if (!opts?.theme) {
+	if (!('skeletontheme' in opts)) {
 		const q = {
 			type: 'select',
 			name: 'theme',
@@ -198,7 +200,7 @@ Problems? Open an issue on ${cyan(
 	}
 
 	//Skeleton Template Selection
-	if (!opts?.skeletontemplate) {
+	if (!('skeletontemplate' in opts)) {
 		const q = {
 			type: 'select',
 			name: 'skeletontemplate',
@@ -219,29 +221,24 @@ Problems? Open an issue on ${cyan(
 		};
 		questions.push(q);
 	}
-	
+
 	const onCancel = () => {
 		console.log('Exiting');
 		process.exit();
 	};
 
-	// ts-ignore
 	const response = await prompts(questions, { onCancel });
 	Object.keys(response).forEach((prop) => (opts[prop] = response[prop]));
 
-	//Map some values for compat with what svelte-add's create expects.  Not that the skeleton references below
-	//have nothing to do with SkeletonUI, but rather Svelte's internal naming for their starter templates.
+	//Map some values for compat with what svelte-create expects.  Note that the skeleton references below
+	//have nothing to do with us, but rather create-svelte's internal naming for their starter templates.
 	if (opts.framework == 'svelte-kit') {
 		opts.template = 'skeleton';
 	}
 	if (opts.framework == 'svelte-kit-lib') {
 		opts.template = 'skeletonlib';
 	}
-	// We don't ask for path, but it may have been passed in as an arg
-	if (opts.path == undefined) {
-		opts.path = '';
-	}
-	opts.path += opts.name.replace(/\s+/g, '-').toLowerCase();
+
 	return opts;
 }
 main();

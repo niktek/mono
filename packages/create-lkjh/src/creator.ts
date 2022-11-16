@@ -6,24 +6,27 @@ import { spawnSync } from 'node:child_process';
 import fs from 'fs-extra';
 import path from 'path';
 import { dist } from './utils.js';
+import { type Options } from 'create-svelte/types/internal';
 
-export type Options = {
-	name: string;
-	template: 'default' | 'skeleton' | 'skeletonlib';
-	types: 'typescript' | 'checkjs' | null;
-	prettier: boolean;
-	eslint: boolean;
-	playwright: boolean;
-};
+// NOTE: Any changes here must also be reflected in the --help output in bin.ts.
+// Probably a good idea to do a search on the values you are changing to catch any other areas they are used in e.g. twplugins
+// Codebase would be a lot cleaner if there was actual useful Reflect() options.
+export class SkeletonOptions implements Options {
+	// svelte-create options
+	name: string = 'new-skeleton-app';
+	template: 'default' | 'skeleton' | 'skeletonlib' = 'skeleton';
+	types: 'typescript' | 'checkjs' | null = 'typescript';
+	prettier: boolean = true;
+	eslint: boolean = true;
+	playwright: boolean = false;
 
-export type SkelOptions = Options & {
+	// create-skeleton-app additions
 	help: boolean;
 	quiet: boolean;
-	framework: 'svelte-kit-lib' | 'svelte-kit' | 'vite' | 'astro';
-	path: string;
-	name: string;
-	twplugins: Array<'forms' | 'typography' | 'line-clamp' | 'aspect-ratio' | null> | 'none';
-	theme:
+	framework: 'svelte-kit' | 'svelte-kit-lib' = 'svelte-kit';
+	path: string = '';
+	twplugins: Array<'forms' | 'typography' | 'line-clamp' | 'aspect-ratio'>;
+	skeletontheme:
 		| 'skeleton'
 		| 'modern'
 		| 'hamlindigo'
@@ -32,22 +35,25 @@ export type SkelOptions = Options & {
 		| 'gold-nouveau'
 		| 'vintage'
 		| 'seafoam'
-		| 'crimson';
-	skeletontemplate: string;
-	templatePath: string;
-	skeletonui: boolean;
-	monorepo: boolean;
+		| 'crimson' = 'skeleton';
+	skeletontemplate: string = 'bare';
+	packagemanager: string = 'npm';
+	// props below are private to the Skeleton team
+	monorepo: boolean = false;
 	packages: string[];
+	skeletonui: boolean = true;
 	workspace: string;
-	packagemanager: string;
-};
+}
 
-export function createSkeleton(opts: SkelOptions) {
+export async function createSkeleton(opts: SkeletonOptions) {
 	//create-svelte will happily overwrite an existing directory, foot guns are bad mkay
+	opts.path = path.resolve(opts?.path, opts.name.replace(/\s+/g, '-').toLowerCase());
+
 	if (fs.existsSync(opts.path)) {
-		console.log('Install directory already exists!');
+		console.error('Install directory already exists!');
 		return;
 	}
+	fs.mkdirp(opts.path);
 
 	//create-svelte will build the base install for us
 	create(opts.path, opts);
@@ -64,20 +70,21 @@ export function createSkeleton(opts: SkelOptions) {
 		'@brainandbones/skeleton'
 	];
 
-	if (opts.twplugins != null && opts.twplugins != 'none') {
+	if ('twplugins' in opts) {
+		// if they were passed in by an arg then they will be in a comma delimited string
+		if (typeof opts.twplugins === 'string') {
+			// @ts-ignore
+			opts.twplugins = Array.from(opts.twplugins.split(','));
+		}
 		opts.twplugins.map((val) => installParams.push('@tailwindcss/' + val));
 	}
 
-	if (!opts.quiet) {
-		console.log('Working..');
+	if (!('quiet' in opts)) {
+		console.log('Working...');
 	}
-	const pm = whichPMRuns();
-	if (pm != undefined) {
-		opts.packagemanager = pm.name
-	} else {
-		opts.packagemanager = 'npm'
-	}
-	spawnSync(opts.packagemanager , installParams);
+
+	opts.packagemanager = whichPMRuns()?.name || 'npm';
+	spawnSync(opts.packagemanager, installParams);
 
 	// write out config files
 	out('svelte.config.js', createSvelteConfig());
@@ -120,16 +127,16 @@ export default config;
 	return str;
 }
 
-function createTailwindConfig(opts: SkelOptions) {
+function createTailwindConfig(opts: SkeletonOptions) {
 	const plugins = [`require('@brainandbones/skeleton/tailwind/theme.cjs')`];
-	if (opts.twplugins != null && opts.twplugins != 'none') {
+	if ('twplugins' in opts) {
 		opts.twplugins.map((val) => plugins.push(`require('@tailwindcss/${val}')`));
 	}
 	let disableCorePlugin = '';
 	let themeExtension = '';
-	if (opts.twplugins.includes('aspect-ratio')){
+	if (opts.twplugins.includes('aspect-ratio')) {
 		disableCorePlugin = `
-	corePlugins: { aspectRatio: false }, `
+	corePlugins: { aspectRatio: false }, `;
 		themeExtension = `
 	"theme": {
 		"aspectRatio": {
@@ -178,9 +185,9 @@ function createPostCssConfig() {
 	return str;
 }
 
-function createSvelteKitLayout(opts: SkelOptions) {
+function createSvelteKitLayout(opts: SkeletonOptions) {
 	const str = `<script>
-	import '@brainandbones/skeleton/themes/theme-${opts.theme}.css';
+	import '@brainandbones/skeleton/themes/theme-${opts.skeletontheme}.css';
 	import '@brainandbones/skeleton/styles/all.css';
 	import '../app.postcss';
 </script>
@@ -188,7 +195,7 @@ function createSvelteKitLayout(opts: SkelOptions) {
 	return str;
 }
 
-function copyTemplate(opts: SkelOptions) {
+function copyTemplate(opts: SkeletonOptions) {
 	const src = path.resolve(dist('../templates/'), opts.skeletontemplate + '/');
 	fs.copySync(src, './src/', { overwrite: true });
 	// patch back in their theme choice - it may have been replaced by the theme template, it may still be the correct auto-genned one, depends on the template - we don't care, this fixes it.
@@ -196,7 +203,7 @@ function copyTemplate(opts: SkelOptions) {
 	const reg = /theme-.*\.css';$/gim;
 	fs.writeFileSync(
 		'./src/routes/+layout.svelte',
-		content.replace(reg, `theme-${opts.theme}.css';`)
+		content.replace(reg, `theme-${opts.skeletontheme}.css';`)
 	);
 }
 
