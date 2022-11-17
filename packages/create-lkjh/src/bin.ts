@@ -35,9 +35,7 @@ async function main() {
 		// @ts-ignore
 		const pathToInstall = opts.path;
 		// prettier-ignore
-		const finalInstructions =
-			bold(
-				cyan(`
+		const finalInstructions = bold(cyan(`
 Done! You can now:
 
 cd ${path.relative(process.cwd() + '/..', pathToInstall)}
@@ -45,6 +43,7 @@ ${runString}
 
 `)) + grey(`Need some help or found an issue? Visit us on Discord https://discord.gg/EXqV7W8MtY`);
 		console.log(finalInstructions);
+		console.log(path.relative(process.cwd() + '/..', pathToInstall), process.cwd() + '/..', pathToInstall)
 	}
 	process.exit();
 }
@@ -63,7 +62,18 @@ async function parseArgs() {
 			m: 'monorepo',
 			q: 'quiet'
 		},
-		boolean: ['help', 'quiet', 'monorepo', 'skeletonui', 'prettier', 'eslint', 'playwright', 'forms', 'typography', 'lineclamp']
+		boolean: [
+			'help',
+			'quiet',
+			'monorepo',
+			'skeletonui',
+			'prettier',
+			'eslint',
+			'playwright',
+			'forms',
+			'typography',
+			'lineclamp'
+		]
 	});
 
 	// Show help if specified regardless of how many other options are specified, have fun updating the text string :(

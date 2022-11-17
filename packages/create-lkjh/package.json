@@ -1,6 +1,6 @@
 {
 	"name": "create-lkjh",
-	"version": "0.1.14-beta.21",
+	"version": "0.1.14",
 	"description": "Creates Skeleton UI apps on top of Svelte Kit, Vite (Svelte) and Astro",
 	"keywords": [],
 	"author": "niktek <nik@niktek.io>",
