@@ -3,35 +3,48 @@ import { SkeletonOptions, createSkeleton } from './creator';
 import fs from 'fs-extra';
 import mri from 'mri';
 import prompts from 'prompts';
-import { bold, cyan, gray, red } from 'kleur/colors';
+import { bold, cyan, gray, grey, red } from 'kleur/colors';
 import { dist, getHelpText } from './utils';
 import path from 'path';
 
 async function main() {
+	// grab any passed arguments from the command line
 	let opts: SkeletonOptions = await parseArgs();
 
 	if ('quiet' in opts) {
-		// take the passed args and map them over the default vals of the class and then update opts with the merged options
+		// in quiet mode we prefill the defaults, then overlay the passed options
 		let defaults = new SkeletonOptions();
 		opts = Object.assign(defaults, opts);
 	} else {
-		// We take the values provided (if any) and ask the user to fill in the rest
+		// in interactie mode we ask the user to fill anything not passed in
 		opts = await askForMissingParams(opts);
 	}
 
-	// Now that we have all of the options, lets go build it.
+	// Now that we have all of the options, lets create it.
 	await createSkeleton(opts);
 
+	// And give the user some final information on what to do Next
 	if (!('quiet' in opts)) {
-		let runString = `${opts.packagemanager} dev`;
-		if (opts.packagemanager == 'npm') {
+		// @ts-ignore
+		const pm = opts.packagemanager;
+		let runString = `${pm} dev`;
+
+		if (pm == 'npm') {
 			runString = 'npm run dev';
 		}
-		const finalInstructions = `
+		// @ts-ignore
+		const pathToInstall = opts.path;
+		// prettier-ignore
+		const finalInstructions =
+			bold(
+				cyan(`
 Done! You can now:
-cd ${path.relative(process.cwd() + '/..', opts.path)}
-${runString}`;
-		console.log(bold(cyan(finalInstructions)));
+
+cd ${path.relative(process.cwd() + '/..', pathToInstall)}
+${runString}
+
+`)) + grey(`Need some help or found an issue? Visit us on Discord https://discord.gg/EXqV7W8MtY`);
+		console.log(finalInstructions);
 	}
 	process.exit();
 }
@@ -50,7 +63,7 @@ async function parseArgs() {
 			m: 'monorepo',
 			q: 'quiet'
 		},
-		boolean: ['help', 'quiet', 'monorepo', 'skeletonui', 'prettier', 'eslint', 'playwright']
+		boolean: ['help', 'quiet', 'monorepo', 'skeletonui', 'prettier', 'eslint', 'playwright', 'forms', 'typography', 'lineclamp']
 	});
 
 	// Show help if specified regardless of how many other options are specified, have fun updating the text string :(
@@ -78,17 +91,17 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	console.log(gray(`\ncreate-skeleton-app version ${version}`));
 	console.log(disclaimer);
 
-	if (!('path' in opts)) opts.path = ''; // When in interactive mode, we do not ask for a path, but respect any that have been supplied.
+	// @ts-ignore
+	if (!('path' in opts)) opts.path = ''; // We do not ask for a path, but respect any that have been supplied.
 
 	const questions = [];
+
 	//NOTE: When doing checks here, make sure to test for the presence of the prop, not the prop value as it may be set to false deliberately.
 
-	// Package name
 	if (!('name' in opts)) {
 		questions.push({ type: 'text', name: 'name', message: 'Name for your new project:' });
 	}
 
-	// Framework Selection
 	if (!('framework' in opts)) {
 		const q = {
 			type: 'select',
@@ -162,26 +175,26 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	}
 
 	// Tailwind Plugin Selection
-	if (!('twplugins' in opts)) {
-		const q = {
-			type: 'multiselect',
-			name: 'twplugins',
-			message: 'Pick tailwind plugins to add:',
-			choices: [
-				{ title: 'forms', value: 'forms' },
-				{ title: 'typography', value: 'typography' },
-				{ title: 'line-clamp', value: 'line-clamp' },
-				{ title: 'aspect-ratio', value: 'aspect-ratio' }
-			]
-		};
-		questions.push(q);
-	}
+	// if (!('twplugins' in opts)) {
+	// 	const q = {
+	// 		type: 'multiselect',
+	// 		name: 'twplugins',
+	// 		message: 'Pick tailwind plugins to add:',
+	// 		choices: [
+	// 			{ title: 'forms', value: 'forms' },
+	// 			{ title: 'typography', value: 'typography' },
+	// 			{ title: 'line-clamp', value: 'line-clamp' },
+	// 			{ title: 'aspect-ratio', value: 'aspect-ratio' }
+	// 		]
+	// 	};
+	// 	questions.push(q);
+	// }
 
 	// Skeleton Theme Selection
 	if (!('skeletontheme' in opts)) {
 		const q = {
 			type: 'select',
-			name: 'theme',
+			name: 'skeletontheme',
 			message: 'Select a theme:',
 			initial: 0,
 			choices: [
@@ -227,6 +240,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 		process.exit();
 	};
 
+	// Get user responses and overlay them onto the opts to provide a filled configuration
 	const response = await prompts(questions, { onCancel });
 	Object.keys(response).forEach((prop) => (opts[prop] = response[prop]));
 

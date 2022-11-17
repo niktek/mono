@@ -3,6 +3,9 @@
 - [x] Add help screen for all cli options
 - [x] ~~Add `ora` spinner for working portion~~ - needs to be converted to async bullshit, or look at `execa`
 - [x] Make the next steps portion more clear
+- [ ] add /apple-touch-icon-precomposed.png ?
+- [x] remove twplugins from UI and split into bools
+- [ ] update build process to scan template sites dir to gather files
 
 
 | create-svelte 	| create-vite 			| create-astro 		| create-skeleton-app

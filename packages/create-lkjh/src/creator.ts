@@ -8,12 +8,15 @@ import path from 'path';
 import { dist } from './utils.js';
 import { type Options } from 'create-svelte/types/internal';
 
-// NOTE: Any changes here must also be reflected in the --help output in bin.ts.
-// Probably a good idea to do a search on the values you are changing to catch any other areas they are used in e.g. twplugins
-// Codebase would be a lot cleaner if there was actual useful Reflect() options.
-export class SkeletonOptions implements Options {
-	// svelte-create options
-	name: string = 'new-skeleton-app';
+// NOTE: Any changes here must also be reflected in the --help output in utils.ts and shortcut expansions in bin.ts.
+// Probably a good idea to do a search on the values you are changing to catch any other areas they are used in
+// Codebase would be a lot cleaner if Reflect() actually returned anything useful.
+// unbuild doesn't seem to like it when SkeletonOptions implements the Options type from create-svelte's internal type definitions
+// so they are copied over here just to make everything even more brittle.
+
+export class SkeletonOptions {
+	// svelte-create expects these options, do not change the names or values.
+	name: string = 'new-skel-app';
 	template: 'default' | 'skeleton' | 'skeletonlib' = 'skeleton';
 	types: 'typescript' | 'checkjs' | null = 'typescript';
 	prettier: boolean = true;
@@ -25,7 +28,9 @@ export class SkeletonOptions implements Options {
 	quiet: boolean;
 	framework: 'svelte-kit' | 'svelte-kit-lib' = 'svelte-kit';
 	path: string = '';
-	twplugins: Array<'forms' | 'typography' | 'line-clamp' | 'aspect-ratio'>;
+	forms: boolean = false;
+	typography: boolean = false;
+	lineclamp: boolean = false;
 	skeletontheme:
 		| 'skeleton'
 		| 'modern'
@@ -60,7 +65,7 @@ export async function createSkeleton(opts: SkeletonOptions) {
 	process.chdir(opts.path);
 
 	// install packages
-	const installParams = [
+	let installParams = [
 		'i',
 		'-D',
 		'tailwindcss',
@@ -70,14 +75,9 @@ export async function createSkeleton(opts: SkeletonOptions) {
 		'@brainandbones/skeleton'
 	];
 
-	if ('twplugins' in opts) {
-		// if they were passed in by an arg then they will be in a comma delimited string
-		if (typeof opts.twplugins === 'string') {
-			// @ts-ignore
-			opts.twplugins = Array.from(opts.twplugins.split(','));
-		}
-		opts.twplugins.map((val) => installParams.push('@tailwindcss/' + val));
-	}
+	if (opts?.typography) installParams.push('@tailwindcss/typography')
+	if (opts?.forms) installParams.push('@tailwindcss/forms');
+	if (opts?.lineclamp) installParams.push('@tailwindcss/line-clamp');
 
 	if (!('quiet' in opts)) {
 		console.log('Working...');
@@ -109,12 +109,6 @@ const config = {
 	kit: {
 		adapter: adapter()
 	},
-	vitePlugin: {
-		emitCss: false,
-	},
-	compilerOptions: {
-		css: "injected",
-	},
 	preprocess: [
 		preprocess({
 			postcss: true,
@@ -128,46 +122,19 @@ export default config;
 }
 
 function createTailwindConfig(opts: SkeletonOptions) {
-	const plugins = [`require('@brainandbones/skeleton/tailwind/theme.cjs')`];
-	if ('twplugins' in opts) {
-		opts.twplugins.map((val) => plugins.push(`require('@tailwindcss/${val}')`));
-	}
-	let disableCorePlugin = '';
-	let themeExtension = '';
-	if (opts.twplugins.includes('aspect-ratio')) {
-		disableCorePlugin = `
-	corePlugins: { aspectRatio: false }, `;
-		themeExtension = `
-	"theme": {
-		"aspectRatio": {
-			"auto": "auto",
-			"square": "1 / 1",
-			"video": "16 / 9",
-			"1": "1",
-			"2": "2",
-			"3": "3",
-			"4": "4",
-			"5": "5",
-			"6": "6",
-			"7": "7",
-			"8": "8",
-			"9": "9",
-			"10": "10",
-			"11": "11",
-			"12": "12",
-			"13": "13",
-			"14": "14",
-			"15": "15",
-			"16": "16"
-		}
-	}`;
-	}
+	let plugins = [];
+	if (opts?.forms) plugins.push(`require('@tailwindcss/forms')`);
+	if (opts?.typography) plugins.push(`require('@tailwindcss/typography')`);
+	if (opts?.lineclamp) plugins.push('@tailwindcss/line-clamp');
+	plugins.push(`require('@brainandbones/skeleton/tailwind/theme.cjs')`);
+
+	
 	const str = `/** @type {import('tailwindcss').Config} */
 module.exports = {
-	darkMode: 'class',${disableCorePlugin}
+	darkMode: 'class',
 	content: ['./src/**/*.{html,js,svelte,ts}', require('path').join(require.resolve('@brainandbones/skeleton'), '../**/*.{html,js,svelte,ts}')],
 	theme: {
-		extend: {},${themeExtension}
+		extend: {},
 	},
 	plugins: [${plugins.join(',')}],
 }
