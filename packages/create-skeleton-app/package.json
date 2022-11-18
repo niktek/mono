@@ -1,11 +1,11 @@
 {
 	"name": "create-skeleton-app",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Use this CLI app to setup a new Skeleton application in a new SvelteKit project.",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/skeletonlabs/skeleton",
-		"directory": "packages/create-skeleton-app"
+		"directory": "packages/create-skeleton-app/"
 	},
 	"homepage": "https://www.skeleton.dev",
 	"keywords": [
