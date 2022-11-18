@@ -16,7 +16,7 @@ async function main() {
 		let defaults = new SkeletonOptions();
 		opts = Object.assign(defaults, opts);
 	} else {
-		// in interactie mode we ask the user to fill anything not passed in
+		// in interactive mode we ask the user to fill anything not passed in
 		opts = await askForMissingParams(opts);
 	}
 
@@ -43,7 +43,7 @@ ${runString}
 
 `)) + grey(`Need some help or found an issue? Visit us on Discord https://discord.gg/EXqV7W8MtY`);
 		console.log(finalInstructions);
-		console.log(path.relative(process.cwd() + '/..', pathToInstall), process.cwd() + '/..', pathToInstall)
+		//console.log(path.relative(process.cwd() + '/..', pathToInstall), process.cwd() + '/..', pathToInstall)
 	}
 	process.exit();
 }
@@ -75,8 +75,11 @@ async function parseArgs() {
 			'lineclamp'
 		]
 	});
-
-	// Show help if specified regardless of how many other options are specified, have fun updating the text string :(
+	// If a user invokes 'create-app blah foo', it falls into the _ catch all list, the best we can do is take the first one and use that as the name
+	if (opts._.length) {
+		opts.name = opts._[0];
+	}
+	// Show help if specified regardless of how many other options are specified, have fun updating the text string in utils.ts :(
 	if ('help' in opts) {
 		console.log(getHelpText());
 		process.exit();
@@ -103,7 +106,8 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 
 	// @ts-ignore
 	if (!('path' in opts)) opts.path = ''; // We do not ask for a path, but respect any that have been supplied.
-
+	// @ts-ignore
+	if (!('framework' in opts)) opts.framework = 'svelte-kit'; //likewise respect any framework passed in
 	const questions = [];
 
 	//NOTE: When doing checks here, make sure to test for the presence of the prop, not the prop value as it may be set to false deliberately.
@@ -112,20 +116,20 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 		questions.push({ type: 'text', name: 'name', message: 'Name for your new project:' });
 	}
 
-	if (!('framework' in opts)) {
-		const q = {
-			type: 'select',
-			name: 'framework',
-			message: 'Select what framework you wish to use:',
-			choices: [
-				{ title: 'Svelte Kit', value: 'svelte-kit' },
-				{ title: 'Svelte Kit Library', value: 'svelte-kit-lib' }
-				// { title: 'Vite (Svelte)', value: 'vite' },
-				// { title: 'Astro', value: 'astro' }
-			]
-		};
-		questions.push(q);
-	}
+	// if (!('framework' in opts)) {
+	// 	const q = {
+	// 		type: 'select',
+	// 		name: 'framework',
+	// 		message: 'Select what framework you wish to use:',
+	// 		choices: [
+	// 			{ title: 'Svelte Kit', value: 'svelte-kit' },
+	// 			{ title: 'Svelte Kit Library', value: 'svelte-kit-lib' }
+	// 			// { title: 'Vite (Svelte)', value: 'vite' },
+	// 			// { title: 'Astro', value: 'astro' }
+	// 		]
+	// 	};
+	// 	questions.push(q);
+	// }
 
 	if (!('types' in opts)) {
 		const q = {
@@ -185,20 +189,20 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	}
 
 	// Tailwind Plugin Selection
-	// if (!('twplugins' in opts)) {
-	// 	const q = {
-	// 		type: 'multiselect',
-	// 		name: 'twplugins',
-	// 		message: 'Pick tailwind plugins to add:',
-	// 		choices: [
-	// 			{ title: 'forms', value: 'forms' },
-	// 			{ title: 'typography', value: 'typography' },
-	// 			{ title: 'line-clamp', value: 'line-clamp' },
-	// 			{ title: 'aspect-ratio', value: 'aspect-ratio' }
-	// 		]
-	// 	};
-	// 	questions.push(q);
-	// }
+	if (!('twplugins' in opts)) {
+		const q = {
+			type: 'multiselect',
+			name: 'twplugins',
+			message: 'Pick tailwind plugins to add:',
+			
+			choices: [
+				{ title: 'forms', value: 'forms' },
+				{ title: 'typography', value: 'typography' },
+				{ title: 'line-clamp', value: 'lineclamp' },
+			]
+		};
+		questions.push(q);
+	}
 
 	// Skeleton Theme Selection
 	if (!('skeletontheme' in opts)) {
@@ -250,10 +254,15 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 		process.exit();
 	};
 
-	// Get user responses and overlay them onto the opts to provide a filled configuration
+	// Get user responses to missing args
 	const response = await prompts(questions, { onCancel });
-	Object.keys(response).forEach((prop) => (opts[prop] = response[prop]));
 
+	//Prompts returns the twplugins as an array, but it makes it easier to use on the command line if they are seperated booleans
+	//We map them out from the array here and delete the now useless twplugins prop before proceeding to overlay the response values onto opts
+	Object.keys(response.twplugins).forEach((index) => (opts[response.twplugins[index]] = true));
+	delete response.twplugins;
+	Object.assign(opts, response)
+	
 	//Map some values for compat with what svelte-create expects.  Note that the skeleton references below
 	//have nothing to do with us, but rather create-svelte's internal naming for their starter templates.
 	if (opts.framework == 'svelte-kit') {
@@ -262,7 +271,6 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	if (opts.framework == 'svelte-kit-lib') {
 		opts.template = 'skeletonlib';
 	}
-
 	return opts;
 }
 main();

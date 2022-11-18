@@ -24,6 +24,7 @@ export class SkeletonOptions {
 	playwright: boolean = false;
 
 	// create-skeleton-app additions
+	_: string[]; //catch all for extraneous params from mri, used to capture project name.
 	help: boolean;
 	quiet: boolean;
 	framework: 'svelte-kit' | 'svelte-kit-lib' = 'svelte-kit';
@@ -84,7 +85,17 @@ export async function createSkeleton(opts: SkeletonOptions) {
 	}
 
 	opts.packagemanager = whichPMRuns()?.name || 'npm';
-	spawnSync(opts.packagemanager, installParams);
+	const result = spawnSync(opts.packagemanager, installParams, { shell: true });
+
+	// Capture any errors from stderr and display for the user to report it to us
+	if (result?.stderr.toString().length) {
+		console.log(
+			'An error has occurred trying to install packages with your package manager, please send us the following text onto our Github or Discord:\n',
+			result?.stderr.toString()
+		);
+		process.exit();
+	}
+	console.log('stderr :\n', result?.stderr.toString());
 
 	// write out config files
 	out('svelte.config.js', createSvelteConfig());
@@ -109,6 +120,12 @@ const config = {
 	kit: {
 		adapter: adapter()
 	},
+	vitePlugin: {
+        emitCss: false,
+    },
+    compilerOptions: {
+        css: "injected",
+    },
 	preprocess: [
 		preprocess({
 			postcss: true,
@@ -125,7 +142,7 @@ function createTailwindConfig(opts: SkeletonOptions) {
 	let plugins = [];
 	if (opts?.forms) plugins.push(`require('@tailwindcss/forms')`);
 	if (opts?.typography) plugins.push(`require('@tailwindcss/typography')`);
-	if (opts?.lineclamp) plugins.push('@tailwindcss/line-clamp');
+	if (opts?.lineclamp) plugins.push(`require('@tailwindcss/line-clamp')`);
 	plugins.push(`require('@brainandbones/skeleton/tailwind/theme.cjs')`);
 
 	

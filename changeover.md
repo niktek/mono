@@ -33,3 +33,9 @@
 - [ ] root level eslint/formatter setups
 - [ ] template sites setup for create-skeleton-app
 - [ ] adjust create-skeleton-app build process to copy from template sites
+
+
+## Publishing packages
+- add an Automation token to ~/.npmrc as `//registry.npmjs.org/:_authToken=INSERTOKEN`  still need to figure out what environment variables are needed for Github Actions etc
+- create-skeleton-app will only appear under Skeleton Admins account as it is not scoped to the org.
+- revoking the access token will only result in a 404 result on the publishing process... ?!?!

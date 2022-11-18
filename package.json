@@ -1,6 +1,6 @@
 {
 	"name": "mono",
-	"version": "0.0.1",
+	"version": "0.0.0",
 	"private": true,
 	"type": "module",
 	"scripts": {
@@ -14,7 +14,7 @@
 		"@types/node": "^18.11.9",
 		"@typescript-eslint/eslint-plugin": "^5.27.0",
 		"@typescript-eslint/parser": "^5.27.0",
-		"create-lkjh": "workspace:*",
+		"create-skeleton-app": "workspace:*",
 		"eslint": "^8.16.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-svelte3": "^4.0.0",

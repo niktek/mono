@@ -38,6 +38,6 @@ Option              Short   Quiet Default   Values                      Descript
 Quiet mode is for automated installs for testing, CI/CD.  It will take all of the default values in the
 Quiet Default column, but you can provide any other flags to override as you see fit.  If you just want
 to generate a new project but still ask for a name, you need to provide all the other args except the 
-one to be filled in by the user.
+ones to be filled in by the user.
 `;
 }
