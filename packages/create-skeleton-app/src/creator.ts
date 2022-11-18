@@ -95,7 +95,6 @@ export async function createSkeleton(opts: SkeletonOptions) {
 		);
 		process.exit();
 	}
-	console.log('stderr :\n', result?.stderr.toString());
 
 	// write out config files
 	out('svelte.config.js', createSvelteConfig());

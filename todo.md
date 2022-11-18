@@ -41,5 +41,3 @@
 - uses changeset
 - pnpm only
 - use astro-add for adding tailwind (if it can keep quiet)
-
-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
