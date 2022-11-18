@@ -7,14 +7,14 @@
 		"dev": "pnpm --stream -r dev",
 		"build": "pnpm --stream -r run build",
 		"site": "skel --types=typescript --prettier --eslint --playwright=false -f=svelte-kit -p=./sites/ -t=skeleton --skeletontemplate=bare",
-		"templatesite": "skel --types=typescript --prettier --eslint --playwright=false -f=svelte-kit -p=./templates/ -t=skeleton --skeletontemplate=bare"
+		"templatesite": "skel --types=typescript --prettier --eslint --playwright=false -f=svelte-kit -p=./templates/ -t=keleton"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.25.2",
 		"@types/node": "^18.11.9",
 		"@typescript-eslint/eslint-plugin": "^5.27.0",
 		"@typescript-eslint/parser": "^5.27.0",
-		"create-skeleton-app": "workspace:*",
+		"create-skeleton-app": "workspace:0.0.3-beta.1",
 		"eslint": "^8.16.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-svelte3": "^4.0.0",

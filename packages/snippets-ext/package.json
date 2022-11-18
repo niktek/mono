@@ -1,0 +1,21 @@
+{
+	"name": "skeleton-snippet-ext",
+	"displayName": "Skeleton Snippets",
+	"description": "Skeleton Snippets",
+	"version": "0.0.1",
+	"publisher": "vscode-samples",
+	"engines": {
+		"vscode": "^1.28.0"
+	},
+	"categories": [
+		"Snippets"
+	],
+	"contributes": {
+		"snippets": [
+			{
+				"language": "javascript",
+				"path": "./snippets.json"
+			}
+		]
+	}
+}
