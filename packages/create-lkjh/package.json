@@ -1,9 +1,20 @@
 {
-	"name": "create-lkjhg",
+	"name": "create-skeleton-app",
 	"version": "0.0.2",
-	"description": "Creates Skeleton Apps on top of Svelte Kit, Vite (Svelte) and Astro",
-	"keywords": [],
-	"author": "niktek <nik@niktek.io>",
+	"description": "Use this CLI app to setup a new Skeleton application in a new SvelteKit project.",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/skeletonlabs/skeleton",
+		"directory": "packages/create-skeleton-app"
+	},
+	"homepage": "https://www.skeleton.dev",
+	"keywords": [
+		"skeleton",
+		"svelte",
+		"sveltekit",
+		"svelte-kit"
+	],
+	"author": "Skeleton Admin <admin@skeletonlabs.co>",
 	"license": "MIT",
 	"type": "module",
 	"exports": {
