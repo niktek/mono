@@ -130,6 +130,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	// 	};
 	// 	questions.push(q);
 	// }
+	
 
 	if (!('types' in opts)) {
 		const q = {
