@@ -7,6 +7,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { dist } from './utils.js';
 import { type Options } from 'create-svelte/types/internal';
+import { bold, red } from 'kleur/colors';
 
 // NOTE: Any changes here must also be reflected in the --help output in utils.ts and shortcut expansions in bin.ts.
 // Probably a good idea to do a search on the values you are changing to catch any other areas they are used in
@@ -48,6 +49,7 @@ export class SkeletonOptions {
 	monorepo: boolean = false;
 	packages: string[];
 	skeletonui: boolean = true;
+	skeletontemplatedir: string = 'templates'
 	workspace: string;
 }
 
@@ -56,8 +58,8 @@ export async function createSkeleton(opts: SkeletonOptions) {
 	opts.path = path.resolve(opts?.path, opts.name.replace(/\s+/g, '-').toLowerCase());
 
 	if (fs.existsSync(opts.path)) {
-		console.error('Install directory already exists!');
-		return;
+		console.error(red(bold('Install directory already exists!')));
+		process.exit();
 	}
 	fs.mkdirp(opts.path);
 
@@ -179,8 +181,9 @@ function createSvelteKitLayout(opts: SkeletonOptions) {
 }
 
 function copyTemplate(opts: SkeletonOptions) {
-	const src = path.resolve(dist('../templates/'), opts.skeletontemplate + '/');
-	fs.copySync(src, './src/', { overwrite: true });
+	const src = path.resolve(dist(opts.skeletontemplatedir), opts.skeletontemplate + '/src/');
+	fs.copySync(src, 'src/', { overwrite: true });
+	fs.removeSync('src/meta.json')
 	// patch back in their theme choice - it may have been replaced by the theme template, it may still be the correct auto-genned one, depends on the template - we don't care, this fixes it.
 	const content = fs.readFileSync('./src/routes/+layout.svelte', { encoding: 'utf8', flag: 'r' });
 	const reg = /theme-.*\.css';$/gim;

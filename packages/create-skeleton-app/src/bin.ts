@@ -233,9 +233,9 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 			name: 'skeletontemplate',
 			message: 'Which Skeleton app template?',
 			choices: fs
-				.readdirSync(dist('../templates'))
+				.readdirSync(dist(opts.skeletontemplatedir))
 				.map((dir) => {
-					const meta_file = dist(`../templates/${dir}/meta.json`);
+					const meta_file = dist(`${opts.skeletontemplatedir}/${dir}/meta.json`);
 					const { position, title, description } = JSON.parse(fs.readFileSync(meta_file, 'utf8'));
 					return {
 						position,

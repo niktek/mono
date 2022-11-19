@@ -37,7 +37,7 @@
 	],
 	"scripts": {
 		"prepublishOnly": "npm run build",
-		"dev": "tsx src/bin.ts",
+		"dev": "tsx src/bin.ts --skeletontemplatedir=../../../template-sites/",
 		"build": "unbuild && tsx scripts/copyassets.ts",
 		"stub": "unbuild --stub",
 		"release": "bumpp && npm publish",

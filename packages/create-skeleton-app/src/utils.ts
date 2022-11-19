@@ -1,7 +1,8 @@
 import { fileURLToPath } from 'url';
+import path from 'path';
 
 export function dist(path: string) {
-	return fileURLToPath(new URL(path, import.meta.url).href);
+	return fileURLToPath(new URL(`${path}`, import.meta.url).href);
 }
 
 export function getHelpText() {
