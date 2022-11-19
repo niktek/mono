@@ -1,5 +1,5 @@
 packages:
-  - 'templates'
+  - 'templates-sites/*'
   - 'packages/*'
-  - 'sites/**'
+  - 'sites/*'
   - '!**/test/**'
