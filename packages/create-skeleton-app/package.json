@@ -1,6 +1,6 @@
 {
 	"name": "create-lkjh",
-	"version": "0.1.21-beta.19",
+	"version": "0.1.21-beta.20",
 	"description": "Use this CLI app to setup a new Skeleton application in a new SvelteKit project.",
 	"repository": {
 		"type": "git",
@@ -36,7 +36,7 @@
 	"scripts": {
 		"prepublishOnly": "npm run build",
 		"dev": "tsx src/bin.ts --skeletontemplatedir=../../../template-sites/",
-		"build": "unbuild && tsx ../../scripts/copyassets.ts",
+		"build": "unbuild && tsx scripts/copyassets.ts",
 		"stub": "unbuild --stub",
 		"release": "bumpp && npm publish",
 		"lint": "eslint ."
