@@ -1,6 +1,6 @@
 {
 	"name": "create-lkjh",
-	"version": "0.1.19",
+	"version": "0.1.20",
 	"description": "Use this CLI app to setup a new Skeleton application in a new SvelteKit project.",
 	"repository": {
 		"type": "git",
@@ -30,10 +30,9 @@
 		"skel": "dist/bin.mjs"
 	},
 	"files": [
-		"dist",
+		"dist/*",
 		"bin",
-		"package.json",
-		"templates/*"
+		"package.json"
 	],
 	"scripts": {
 		"prepublishOnly": "npm run build",
