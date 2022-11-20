@@ -1,11 +1,10 @@
-<!-- YOU CAN DELETE EVERYTHING IN THIS LAYOUT AND JUST PUT IN A <slot /> TO GET A BARE LAYOUT -->
 <script lang="ts">
-	import { writable, type Writable } from 'svelte/store';
 	import '@brainandbones/skeleton/themes/theme-skeleton.css';
 	import '@brainandbones/skeleton/styles/all.css';
 	import '../app.postcss';
 	import { AppShell, AppBar, Drawer } from '@brainandbones/skeleton';
-
+	import { writable, type Writable } from 'svelte/store';
+	
 	// Persists the mobile-only nav drawer 'open' state
 	const storeMobileDrawer: Writable<boolean> = writable(false);
 

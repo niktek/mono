@@ -183,15 +183,18 @@ function createSvelteKitLayout(opts: SkeletonOptions) {
 function copyTemplate(opts: SkeletonOptions) {
 	const src = path.resolve(dist(opts.skeletontemplatedir), opts.skeletontemplate);
 
-	fs.copySync(src, 'src/', { overwrite: true });
+	fs.copySync(src, '.', { overwrite: true });
 	fs.removeSync('src/meta.json')
 	// patch back in their theme choice - it may have been replaced by the theme template, it may still be the correct auto-genned one, depends on the template - we don't care, this fixes it.
-	const content = fs.readFileSync('./src/routes/+layout.svelte', { encoding: 'utf8', flag: 'r' });
+	let content = fs.readFileSync('./src/routes/+layout.svelte', { encoding: 'utf8', flag: 'r' });
 	const reg = /theme-.*\.css';$/gim;
 	fs.writeFileSync(
 		'./src/routes/+layout.svelte',
 		content.replace(reg, `theme-${opts.skeletontheme}.css';`)
 	);
+	// update the <body> to have the data-theme
+	content = fs.readFileSync('./src/app.html', { encoding: 'utf8', flag: 'r' });
+	fs.writeFileSync('./src/app.html', content.replace('<body>', `<body data-theme="${opts.skeletontheme}">`));
 }
 
 function out(filename: string, data: string) {

@@ -6,12 +6,11 @@ let dirs = [];
 console.log(process.cwd());
 
 const srcDir = '../../template-sites/';
-const destDir = '../../packages/create-skeleton-app/dist/templates/'
+const destDir = 'dist/templates/'
 dirs = fs.readdirSync(srcDir)
 dirs.forEach((val) => {
-	const copyFrom = path.join(srcDir, val, 'src');
-	const copyTo = path.join(destDir, val);
-	fs.copySync(copyFrom, copyTo, { overwrite: true });
+	fs.copySync(path.join(srcDir, val, 'src'), path.join(destDir, val, 'src'), { overwrite: true });
+	fs.copySync(path.join(srcDir, val, 'static'), path.join(destDir, val, 'static'), { overwrite: true });
 })
 
 fs.copySync('package.json', 'dist/package.json');

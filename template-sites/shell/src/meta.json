@@ -1,5 +1,5 @@
 {
-	"position": 10,
-	"title": "Skeleton with AppShell, AppBar and Drawer for mobile",
-	"description": "A good starting shell for your app"
+	"position": 15,
+	"title": "Skeleton with a basic shell",
+	"description": "Includes AppShell, AppBar and a Drawer for mobile navigation."
 }

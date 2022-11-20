@@ -239,7 +239,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 			choices: fs
 				.readdirSync(dist(templateDir))
 				.map((dir) => {
-					const meta_file = dist(`${templateDir}/${dir}/meta.json`);
+					const meta_file = dist(`${templateDir}/${dir}/src/meta.json`);
 					const { position, title, description } = JSON.parse(fs.readFileSync(meta_file, 'utf8'));
 					return {
 						position,
