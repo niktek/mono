@@ -1,8 +1,15 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
 
-export function dist(path: string) {
-	return fileURLToPath(new URL(`${path}`, import.meta.url).href);
+export function dist(pathToFind: string) {
+	let pathAdjust = '';
+	let base = fileURLToPath(new URL(`./`, import.meta.url).href);
+	if (base.endsWith('shared', base.length - 1)) {
+		pathAdjust = '../';
+	}
+	const res = path.resolve(base, pathAdjust, pathToFind);
+
+	return res;
 }
 
 export function getHelpText() {

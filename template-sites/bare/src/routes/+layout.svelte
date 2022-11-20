@@ -1,4 +1,4 @@
-<!-- YOU CAN DELETE EVERYTHING IN THIS LAYOUT -->
+<!-- YOU CAN DELETE EVERYTHING IN THIS LAYOUT AND JUST PUT IN A <slot /> TO GET A BARE LAYOUT -->
 <script>
 	import '@brainandbones/skeleton/themes/theme-skeleton.css';
 	import '@brainandbones/skeleton/styles/all.css';

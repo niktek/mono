@@ -29,7 +29,7 @@ export class SkeletonOptions {
 	help: boolean;
 	quiet: boolean;
 	framework: 'svelte-kit' | 'svelte-kit-lib' = 'svelte-kit';
-	path: string = '';
+	path: string = '.';
 	forms: boolean = false;
 	typography: boolean = false;
 	lineclamp: boolean = false;
@@ -53,7 +53,7 @@ export class SkeletonOptions {
 	workspace: string;
 }
 
-export async function createSkeleton(opts: SkeletonOptions) {
+export async function createSkeleton(opts: SkeletonOptions) {	
 	//create-svelte will happily overwrite an existing directory, foot guns are bad mkay
 	opts.path = path.resolve(opts?.path, opts.name.replace(/\s+/g, '-').toLowerCase());
 
@@ -181,7 +181,8 @@ function createSvelteKitLayout(opts: SkeletonOptions) {
 }
 
 function copyTemplate(opts: SkeletonOptions) {
-	const src = path.resolve(dist(opts.skeletontemplatedir), opts.skeletontemplate + '/src/');
+	const src = path.resolve(dist(opts.skeletontemplatedir), opts.skeletontemplate);
+
 	fs.copySync(src, 'src/', { overwrite: true });
 	fs.removeSync('src/meta.json')
 	// patch back in their theme choice - it may have been replaced by the theme template, it may still be the correct auto-genned one, depends on the template - we don't care, this fixes it.

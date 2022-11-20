@@ -8,6 +8,8 @@ import { dist, getHelpText } from './utils';
 import path from 'path';
 
 async function main() {
+	dist(".");
+	
 	// grab any passed arguments from the command line
 	let opts: SkeletonOptions = await parseArgs();
 
@@ -98,16 +100,16 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 `;
 
 	const { version } = JSON.parse(
-		fs.readFileSync(new URL('../package.json', import.meta.url), 'utf-8')
+		fs.readFileSync(new URL(dist('../package.json'), import.meta.url), 'utf-8')
 	);
 
 	console.log(gray(`\ncreate-skeleton-app version ${version}`));
 	console.log(disclaimer);
 
 	// @ts-ignore
-	if (!('path' in opts)) opts.path = ''; // We do not ask for a path, but respect any that have been supplied.
-	// @ts-ignore
-	if (!('framework' in opts)) opts.framework = 'svelte-kit'; //likewise respect any framework passed in
+	// if (!('path' in opts)) opts.path = ''; // We do not ask for a path, but respect any that have been supplied.
+	// // @ts-ignore
+	// if (!('framework' in opts)) opts.framework = 'svelte-kit'; //likewise respect any framework passed in
 	const questions = [];
 
 	//NOTE: When doing checks here, make sure to test for the presence of the prop, not the prop value as it may be set to false deliberately.
@@ -228,8 +230,8 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 
 	//Skeleton Template Selection
 	if (!('skeletontemplate' in opts)) {
-		// @ts-ignore
-		const templateDir = opts.skeletontemplatedir
+		// @ts-ignore need to check whether a templatedir has been passed in (might be from a script in package.json pointing to real template projects)
+		const templateDir = opts.skeletontemplatedir || "templates"
 		const q = {
 			type: 'select',
 			name: 'skeletontemplate',
@@ -264,6 +266,8 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	Object.keys(response.twplugins).forEach((index) => (opts[response.twplugins[index]] = true));
 	delete response.twplugins;
 	Object.assign(opts, response)
+	const skelOpts = new SkeletonOptions();
+	Object.assign(skelOpts, opts);
 	
 	//Map some values for compat with what svelte-create expects.  Note that the skeleton references below
 	//have nothing to do with us, but rather create-svelte's internal naming for their starter templates.
@@ -273,6 +277,6 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	if (opts.framework == 'svelte-kit-lib') {
 		opts.template = 'skeletonlib';
 	}
-	return opts;
+	return skelOpts;
 }
 main();
