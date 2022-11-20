@@ -1,6 +1,6 @@
 {
-	"name": "create-lkjh",
-	"version": "0.1.21-beta.24",
+	"name": "create-skeleton-app",
+	"version": "0.0.3-beta.2",
 	"description": "Use this CLI app to setup a new Skeleton application in a new SvelteKit project.",
 	"repository": {
 		"type": "git",
