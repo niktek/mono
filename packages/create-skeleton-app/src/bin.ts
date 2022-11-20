@@ -228,14 +228,16 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 
 	//Skeleton Template Selection
 	if (!('skeletontemplate' in opts)) {
+		// @ts-ignore
+		const templateDir = opts.skeletontemplatedir
 		const q = {
 			type: 'select',
 			name: 'skeletontemplate',
 			message: 'Which Skeleton app template?',
 			choices: fs
-				.readdirSync(dist(opts.skeletontemplatedir))
+				.readdirSync(dist(templateDir))
 				.map((dir) => {
-					const meta_file = dist(`${opts.skeletontemplatedir}/${dir}/meta.json`);
+					const meta_file = dist(`${templateDir}/${dir}/meta.json`);
 					const { position, title, description } = JSON.parse(fs.readFileSync(meta_file, 'utf8'));
 					return {
 						position,
