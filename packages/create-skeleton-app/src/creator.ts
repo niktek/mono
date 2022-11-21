@@ -141,9 +141,10 @@ export default config;
 
 function createTailwindConfig(opts: SkeletonOptions) {
 	let plugins = [];
-	if (opts?.forms) plugins.push(`require('@tailwindcss/forms')`);
-	if (opts?.typography) plugins.push(`require('@tailwindcss/typography')`);
-	if (opts?.lineclamp) plugins.push(`require('@tailwindcss/line-clamp')`);
+	console.log("Just about to write out tailwind config", opts)
+	if (opts.forms) plugins.push(`require('@tailwindcss/forms')`);
+	if (opts.typography) plugins.push(`require('@tailwindcss/typography')`);
+	if (opts.lineclamp) plugins.push(`require('@tailwindcss/line-clamp')`);
 	plugins.push(`require('@brainandbones/skeleton/tailwind/theme.cjs')`);
 
 	

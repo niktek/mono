@@ -7,8 +7,10 @@ export function dist(pathToFind: string) {
 	if (base.endsWith('shared', base.length - 1)) {
 		pathAdjust = '../';
 	}
+	
 	const res = path.resolve(base, pathAdjust, pathToFind);
-
+	console.log('Requested:', pathToFind);
+	console.log('resolved:', res);
 	return res;
 }
 

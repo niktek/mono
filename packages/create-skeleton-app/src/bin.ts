@@ -100,7 +100,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 `;
 
 	const { version } = JSON.parse(
-		fs.readFileSync(new URL(dist('../package.json'), import.meta.url), 'utf-8')
+		fs.readFileSync(dist('../package.json'), 'utf-8')
 	);
 
 	console.log(gray(`\ncreate-skeleton-app version ${version}`));
