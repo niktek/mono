@@ -1,5 +1,33 @@
 # Monorepo for Svelte Kit projects
 
+General overview https://www.youtube.com/watch?v=QNaiKN4AaHw&t=370s worth watching through to the end as the Q&A section covers some relevant issues for us.
+
+Goals:
+Allow multiple packages to sit in the one repo and reference each other.
+
+Secondary goals:
+Allow for integration with private repo's for any commercial add-on's.
+
+Setting up a monorepo with pnpm is a couple of lines in a single file `pnpm-workspace.yaml`.  As nicely summed up in Scott's video, lerna, turbo, rush etc add even more complexity on top of this, for no apparent gains for a repo of our size.
+
+The monorepo affects things in the following ways:
+	1. pnpm will prevent you from adding a package to the root project unless you explicitly use the -w (workspace) flag
+	2. you can now reference other packages in the monorepo.  When you pnpm i -D @brainandbones/skeleton to another site, it will auto insert it with workspace:* reference.
+	3. you can now do bulk commands from the root like building, installing, upgrading packages, etc.  These can be scoped with filters.
+	4. Git branching and tagging strategy needs to take into account multiple projects
+	5. Builds need to be more selective in what triggers them - e.g. GitHub Actions already have means to filter on what branch or folder a commit happens.
+	6. You can create a config package that have settings for eslint/prettier/etc and add a workspace reference to other project so that all projects have consistent and ready to go settings.
+
+
+Anything beyond this applied to any repo:
+	- [changesets](https://github.com/changesets/changesets) - allows for writing more verbose commit messages in markdown instead of the limited git commit message block.  Also handles things like semver and producing aggregated changelog.  Feels a little clunky with the commit process to trigger the generation of them.
+	- [bummpp](https://github.com/antfu/bumpp) handles publishing and versioning of a release, perfect for the CLI tools where release notes are not as needed.
+	- [simple-git-hooks](https://github.com/toplenboren/simple-git-hooks) For things like format/lint on staged commit files.
+	- [husky](https://typicode.github.io/husky/#/?id=features) Same as git hooks
+	- standardise commit messaging
+
+
+
 It's common in coding projects to start splitting code into a re-usable component library or other commonly re-used code. With Vite based projects like Svelte and Svelte Kit, you'll be familiar with the default `$lib` alias, but it's easy to extend this to add your own in `vite.config.js`
 
 ```js

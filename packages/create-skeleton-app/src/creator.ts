@@ -142,9 +142,9 @@ export default config;
 function createTailwindConfig(opts: SkeletonOptions) {
 	let plugins = [];
 	console.log("Just about to write out tailwind config", opts)
-	if (opts.forms) plugins.push(`require('@tailwindcss/forms')`);
-	if (opts.typography) plugins.push(`require('@tailwindcss/typography')`);
-	if (opts.lineclamp) plugins.push(`require('@tailwindcss/line-clamp')`);
+	if (opts.forms == true) plugins.push(`require('@tailwindcss/forms')`);
+	if (opts.typography == true) plugins.push(`require('@tailwindcss/typography')`);
+	if (opts.lineclamp == true) plugins.push(`require('@tailwindcss/line-clamp')`);
 	plugins.push(`require('@brainandbones/skeleton/tailwind/theme.cjs')`);
 
 	
@@ -183,9 +183,11 @@ function createSvelteKitLayout(opts: SkeletonOptions) {
 
 function copyTemplate(opts: SkeletonOptions) {
 	const src = path.resolve(dist(opts.skeletontemplatedir), opts.skeletontemplate);
-
-	fs.copySync(src, '.', { overwrite: true });
-	fs.removeSync('src/meta.json')
+	console.log("SRC:", src);
+	
+	fs.copySync(src + '/src', './src', { overwrite: true });
+	fs.copySync(src + '/static', './static', { overwrite: true });
+	//fs.removeSync('src/meta.json')
 	// patch back in their theme choice - it may have been replaced by the theme template, it may still be the correct auto-genned one, depends on the template - we don't care, this fixes it.
 	let content = fs.readFileSync('./src/routes/+layout.svelte', { encoding: 'utf8', flag: 'r' });
 	const reg = /theme-.*\.css';$/gim;

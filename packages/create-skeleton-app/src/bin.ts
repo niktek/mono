@@ -232,23 +232,28 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	if (!('skeletontemplate' in opts)) {
 		// @ts-ignore need to check whether a templatedir has been passed in (might be from a script in package.json pointing to real template projects)
 		const templateDir = opts.skeletontemplatedir || "templates"
-		const q = {
-			type: 'select',
-			name: 'skeletontemplate',
-			message: 'Which Skeleton app template?',
-			choices: fs
-				.readdirSync(dist(templateDir))
-				.map((dir) => {
-					const meta_file = dist(`${templateDir}/${dir}/src/meta.json`);
-					const { position, title, description } = JSON.parse(fs.readFileSync(meta_file, 'utf8'));
-					return {
+		let parsedChoices = [];
+		fs.readdirSync(dist(templateDir))
+			.forEach((dir) => {
+				const meta_file = dist(`${templateDir}/${dir}/meta.json`);
+				const { position, title, description, enabled } = JSON.parse(
+					fs.readFileSync(meta_file, 'utf8')
+				);
+				if (enabled) {
+					parsedChoices.push({
 						position,
 						title,
 						description,
 						value: dir
-					};
-				})
-				.sort((a, b) => a.position - b.position)
+					});
+				}
+			})
+		parsedChoices.sort((a, b) => a.position - b.position);
+		const q = {
+			type: 'select',
+			name: 'skeletontemplate',
+			message: 'Which Skeleton app template?',
+			choices: parsedChoices
 		};
 		questions.push(q);
 	}
