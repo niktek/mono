@@ -40,8 +40,7 @@ Option              Short   Quiet Default   Values                      Descript
                                             seafoam
                                             crimson
 --skeletontemplate          bare            bare                        The Skeleton template to use
-                                            shell
-                                            all-components
+                                            welcome
 
 Quiet mode is for automated installs for testing, CI/CD.  It will take all of the default values in the
 Quiet Default column, but you can provide any other flags to override as you see fit.  If you just want
