@@ -9,8 +9,8 @@ export function dist(pathToFind: string) {
 	}
 	
 	const res = path.resolve(base, pathAdjust, pathToFind);
-	console.log('Requested:', pathToFind);
-	console.log('resolved:', res);
+	// console.log('Requested:', pathToFind);
+	// console.log('resolved:', res);
 	return res;
 }
 
