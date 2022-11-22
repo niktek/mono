@@ -26,6 +26,9 @@
 	"main": "dist/index.cjs",
 	"module": "dist/index.mjs",
 	"types": "dist/index.d.ts",
+	"bin": {
+		"create-skeleton-app": "dist/bin.mjs"
+	},
 	"files": [
 		"dist/*",
 		"bin"
