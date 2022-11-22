@@ -49,11 +49,11 @@ export class SkeletonOptions {
 	monorepo: boolean = false;
 	packages: string[];
 	skeletonui: boolean = true;
-	skeletontemplatedir: string = 'templates'
+	skeletontemplatedir: string = 'templates';
 	workspace: string;
 }
 
-export async function createSkeleton(opts: SkeletonOptions) {	
+export async function createSkeleton(opts: SkeletonOptions) {
 	//create-svelte will happily overwrite an existing directory, foot guns are bad mkay
 	opts.path = path.resolve(opts?.path, opts.name.replace(/\s+/g, '-').toLowerCase());
 
@@ -68,35 +68,42 @@ export async function createSkeleton(opts: SkeletonOptions) {
 	process.chdir(opts.path);
 
 	// install packages
-	let installParams = [
-		'i',
-		'-D',
-		'tailwindcss',
+	// we can't just populate package.json directly as we don't know the version numbers to install and using 'next' will barf
+	// we can't just efficiently install them with {pm} i -D <list of packages> because yarn
+
+	opts.packagemanager = whichPMRuns()?.name || 'npm';
+
+	// the order matters due to dependency resolution, because yarn
+	let packages = [
 		'postcss',
 		'autoprefixer',
+		'tailwindcss',
 		'svelte-preprocess',
 		'@brainandbones/skeleton'
 	];
 
-	if (opts?.typography) installParams.push('@tailwindcss/typography')
-	if (opts?.forms) installParams.push('@tailwindcss/forms');
-	if (opts?.lineclamp) installParams.push('@tailwindcss/line-clamp');
+	if (opts?.typography) packages.push('@tailwindcss/typography');
+	if (opts?.forms) packages.push('@tailwindcss/forms');
+	if (opts?.lineclamp) packages.push('@tailwindcss/line-clamp');
 
 	if (!('quiet' in opts)) {
 		console.log('Working...');
 	}
 
-	opts.packagemanager = whichPMRuns()?.name || 'npm';
-	const result = spawnSync(opts.packagemanager, installParams, { shell: true });
-
-	// Capture any errors from stderr and display for the user to report it to us
-	if (result?.stderr.toString().length) {
-		console.log(
-			'An error has occurred trying to install packages with your package manager, please send us the following text onto our Github or Discord:\n',
-			result?.stderr.toString()
-		);
-		process.exit();
-	}
+	//add them individually, because yarn
+	packages.forEach((val) => {
+		let result = spawnSync(opts.packagemanager, ['add', '-D', val], { shell: true });
+		// Capture any errors from stderr and display for the user to report it to us
+		// Don't bother for yarn, as it will error (thats right, fucking error) on a warning, which doesn't affect the install, about adding to a non private project in a workspace
+		// That's literally how a fucking monorepo works you fucking imbeciles.  Public projects in a private workspace.
+		if (!(opts.packagemanager == "yarn") && result?.stderr.toString().length) {
+			console.log(
+				'An error has occurred trying to install packages with your package manager, please send us the following text onto our Github or Discord:\n',
+				result?.stderr.toString()
+			);
+			process.exit();
+		}
+	});
 
 	// write out config files
 	out('svelte.config.js', createSvelteConfig());
@@ -146,7 +153,6 @@ function createTailwindConfig(opts: SkeletonOptions) {
 	if (opts.lineclamp == true) plugins.push(`require('@tailwindcss/line-clamp')`);
 	plugins.push(`require('@brainandbones/skeleton/tailwind/theme.cjs')`);
 
-	
 	const str = `/** @type {import('tailwindcss').Config} */
 module.exports = {
 	darkMode: 'class',
@@ -195,7 +201,10 @@ function copyTemplate(opts: SkeletonOptions) {
 	);
 	// update the <body> to have the data-theme
 	content = fs.readFileSync('./src/app.html', { encoding: 'utf8', flag: 'r' });
-	fs.writeFileSync('./src/app.html', content.replace('<body>', `<body data-theme="${opts.skeletontheme}">`));
+	fs.writeFileSync(
+		'./src/app.html',
+		content.replace('<body>', `<body data-theme="${opts.skeletontheme}">`)
+	);
 }
 
 function out(filename: string, data: string) {
