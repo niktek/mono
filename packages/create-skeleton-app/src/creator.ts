@@ -7,7 +7,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { dist } from './utils.js';
 import { type Options } from 'create-svelte/types/internal';
-import { bold, red } from 'kleur/colors';
+import { bold, red, cyan } from 'kleur/colors';
 
 // NOTE: Any changes here must also be reflected in the --help output in utils.ts and shortcut expansions in bin.ts.
 // Probably a good idea to do a search on the values you are changing to catch any other areas they are used in
@@ -46,6 +46,7 @@ export class SkeletonOptions {
 	skeletontemplate: string = 'bare';
 	packagemanager: string = 'npm';
 	// props below are private to the Skeleton team
+	verbose: boolean = false;
 	monorepo: boolean = false;
 	packages: string[];
 	skeletonui: boolean = true;
@@ -103,6 +104,14 @@ export async function createSkeleton(opts: SkeletonOptions) {
 			);
 			process.exit();
 		}
+		
+		// Just to help with any user error reports
+		if (opts.verbose) {
+			const stdout = result?.stdout.toString();
+			if (stdout.length) console.log(bold(cyan('stdout:')), stdout);
+			const stderr = result?.stderr.toString();
+			if (stderr.length) console.log(bold(red("stderr:")), stderr);
+		 }
 	});
 
 	// write out config files

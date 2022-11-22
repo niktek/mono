@@ -62,7 +62,8 @@ async function parseArgs() {
 			p: 'path',
 			t: 'skeletontheme',
 			m: 'monorepo',
-			q: 'quiet'
+			q: 'quiet',
+			v: 'verbose'
 		},
 		boolean: [
 			'help',
@@ -74,7 +75,8 @@ async function parseArgs() {
 			'playwright',
 			'forms',
 			'typography',
-			'lineclamp'
+			'lineclamp',
+			'verbose'
 		]
 	});
 	// If a user invokes 'create-app blah foo', it falls into the _ catch all list, the best we can do is take the first one and use that as the name
