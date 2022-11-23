@@ -1,5 +1,5 @@
 {
-  "include": ["cli", "www"],
+  "include": ["packages", "template-sites"],
   "compilerOptions": {
     /* LANGUAGE COMPILATION OPTIONS */
     "target": "ES2020",

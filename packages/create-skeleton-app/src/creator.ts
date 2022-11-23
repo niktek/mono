@@ -1,12 +1,10 @@
 // Types
-import { create } from 'create-svelte';
-import whichPMRuns from 'which-pm-runs';
+import { create } from 'create-svelte/types/index.js';
 import process from 'process';
 import { spawnSync } from 'node:child_process';
-import fs from 'fs-extra';
+import * as fs from 'fs-extra';
 import path from 'path';
-import { dist } from './utils.js';
-import { type Options } from 'create-svelte/types/internal';
+import { dist, whichPMRuns } from './utils.js';
 import { bold, red, cyan } from 'kleur/colors';
 
 // NOTE: Any changes here must also be reflected in the --help output in utils.ts and shortcut expansions in bin.ts.
@@ -25,9 +23,9 @@ export class SkeletonOptions {
 	playwright: boolean = false;
 
 	// create-skeleton-app additions
-	_: string[]; //catch all for extraneous params from mri, used to capture project name.
-	help: boolean;
-	quiet: boolean;
+	_: string[] = []; //catch all for extraneous params from mri, used to capture project name.
+	help: boolean = false;
+	quiet: boolean = false;
 	framework: 'svelte-kit' | 'svelte-kit-lib' = 'svelte-kit';
 	path: string = '.';
 	forms: boolean = false;
@@ -48,10 +46,10 @@ export class SkeletonOptions {
 	// props below are private to the Skeleton team
 	verbose: boolean = false;
 	monorepo: boolean = false;
-	packages: string[];
+	packages: string[] = [];
 	skeletonui: boolean = true;
 	skeletontemplatedir: string = 'templates';
-	workspace: string;
+	workspace: string = '';
 }
 
 export async function createSkeleton(opts: SkeletonOptions) {

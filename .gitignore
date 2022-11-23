@@ -10,3 +10,6 @@ coverage
 pnpm-lock.yaml
 .vscode
 dist
+.turbo
+.vercel
+.eslintcache

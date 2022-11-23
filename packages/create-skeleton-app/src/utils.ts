@@ -1,6 +1,24 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
 
+
+
+export function whichPMRuns() {
+	const userAgent = process.env.npm_config_user_agent
+	if (!userAgent) {
+		return undefined
+	}
+	const pmSpec = userAgent.split(' ')[0] || ''
+	const separatorPos = pmSpec.lastIndexOf('/')
+	const name = pmSpec?.substring(0, separatorPos)
+	return {
+		name: name === 'npminstall' ? 'cnpm' : name,
+		version: pmSpec?.substring(separatorPos + 1)
+	}
+}
+
+
+
 export function dist(pathToFind: string) {
 	let pathAdjust = '';
 	let base = fileURLToPath(new URL(`./`, import.meta.url).href);
