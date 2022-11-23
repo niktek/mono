@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 import { SkeletonOptions, createSkeleton } from './creator.js';
-import * as fs from 'fs-extra';
-import mri from 'mri';
-// const { mri } = _;
-import prompts from 'prompts';
-// const { prompts } = _;
+import { readFileSync, readdirSync } from 'fs-extra';
+import * as mri from 'mri'
+import * as prompts from 'prompts';
 import { bold, cyan, gray, grey, red } from 'kleur/colors';
 import { dist, getHelpText } from './utils.js';
 import path from 'path';
@@ -82,7 +80,7 @@ async function parseArgs() {
 	});
 	// If a user invokes 'create-app blah foo', it falls into the _ catch all list, the best we can do is take the first one and use that as the name
 	if (opts._.length) {
-		opts.name = opts._[0];
+		opts.name = opts._[0] as string;
 	}
 	// Show help if specified regardless of how many other options are specified, have fun updating the text string in utils.ts :(
 	if ('help' in opts) {
@@ -102,9 +100,7 @@ ${bold(red('This is BETA software; expect bugs and missing features.'))}
 Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issues')} if none exists already.
 `;
 
-	const { version } = JSON.parse(
-		fs.readFileSync(dist('../package.json'), 'utf-8')
-	);
+	const { version } = JSON.parse(	readFileSync(dist('../package.json'), 'utf-8'));
 
 	console.log(gray(`\ncreate-skeleton-app version ${version}`));
 	console.log(disclaimer);
@@ -235,12 +231,12 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	if (!('skeletontemplate' in opts)) {
 		// @ts-ignore need to check whether a templatedir has been passed in (might be from a script in package.json pointing to real template projects)
 		const templateDir = opts.skeletontemplatedir || "templates"
-		let parsedChoices = [];
-		fs.readdirSync(dist(templateDir))
+		let parsedChoices:any = [];
+		readdirSync(dist(templateDir))
 			.forEach((dir) => {
 				const meta_file = dist(`${templateDir}/${dir}/meta.json`);
 				const { position, title, description, enabled } = JSON.parse(
-					fs.readFileSync(meta_file, 'utf8')
+					readFileSync(meta_file, 'utf8')
 				);
 				if (enabled) {
 					parsedChoices.push({
