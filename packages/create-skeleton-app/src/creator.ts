@@ -2,7 +2,7 @@
 import { create } from 'create-svelte';
 import process from 'process';
 import { spawnSync } from 'node:child_process';
-import {existsSync, mkdirp, copySync, readFileSync, writeFileSync } from 'fs-extra';
+import fs from 'fs-extra';
 import path from 'path';
 import { dist, whichPMRuns } from './utils.js';
 import { bold, red, cyan } from 'kleur/colors';
@@ -56,11 +56,11 @@ export async function createSkeleton(opts: SkeletonOptions) {
 	//create-svelte will happily overwrite an existing directory, foot guns are bad mkay
 	opts.path = path.resolve(opts?.path, opts.name.replace(/\s+/g, '-').toLowerCase());
 
-	if (existsSync(opts.path)) {
+	if (fs.existsSync(opts.path)) {
 		console.error(red(bold('Install directory already exists!')));
 		process.exit();
 	}
-	mkdirp(opts.path);
+	fs.mkdirp(opts.path);
 
 	//create-svelte will build the base install for us
 	create(opts.path, opts);
@@ -196,24 +196,24 @@ function createSvelteKitLayout(opts: SkeletonOptions) {
 function copyTemplate(opts: SkeletonOptions) {
 	const src = path.resolve(dist(opts.skeletontemplatedir), opts.skeletontemplate);
 
-	copySync(src + '/src', './src', { overwrite: true });
-	copySync(src + '/static', './static', { overwrite: true });
+	fs.copySync(src + '/src', './src', { overwrite: true });
+	fs.copySync(src + '/static', './static', { overwrite: true });
 
 	// patch back in their theme choice - it may have been replaced by the theme template, it may still be the correct auto-genned one, depends on the template - we don't care, this fixes it.
-	let content = readFileSync('./src/routes/+layout.svelte', { encoding: 'utf8', flag: 'r' });
+	let content = fs.readFileSync('./src/routes/+layout.svelte', { encoding: 'utf8', flag: 'r' });
 	const reg = /theme-.*\.css';$/gim;
-	writeFileSync(
+	fs.writeFileSync(
 		'./src/routes/+layout.svelte',
 		content.replace(reg, `theme-${opts.skeletontheme}.css';`)
 	);
 	// update the <body> to have the data-theme
-	content = readFileSync('./src/app.html', { encoding: 'utf8', flag: 'r' });
-	writeFileSync(
+	content = fs.readFileSync('./src/app.html', { encoding: 'utf8', flag: 'r' });
+	fs.writeFileSync(
 		'./src/app.html',
 		content.replace('<body>', `<body data-theme="${opts.skeletontheme}">`)
 	);
 }
 
 function out(filename: string, data: string) {
-	writeFileSync(filename, data);
+	fs.writeFileSync(filename, data);
 }

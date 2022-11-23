@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { SkeletonOptions, createSkeleton } from './creator.js';
-import { readFileSync, readdirSync } from 'fs-extra';
-import * as mri from 'mri'
-import * as prompts from 'prompts';
+import fs from 'fs-extra';
+import mri from 'mri'
+import prompts from 'prompts';
 import { bold, cyan, gray, grey, red } from 'kleur/colors';
 import { dist, getHelpText } from './utils.js';
 import path from 'path';
@@ -100,7 +100,7 @@ ${bold(red('This is BETA software; expect bugs and missing features.'))}
 Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issues')} if none exists already.
 `;
 
-	const { version } = JSON.parse(	readFileSync(dist('../package.json'), 'utf-8'));
+	const { version } = JSON.parse(	fs.readFileSync(dist('../package.json'), 'utf-8'));
 
 	console.log(gray(`\ncreate-skeleton-app version ${version}`));
 	console.log(disclaimer);
@@ -232,11 +232,11 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 		// @ts-ignore need to check whether a templatedir has been passed in (might be from a script in package.json pointing to real template projects)
 		const templateDir = opts.skeletontemplatedir || "templates"
 		let parsedChoices:any = [];
-		readdirSync(dist(templateDir))
+		fs.readdirSync(dist(templateDir))
 			.forEach((dir) => {
 				const meta_file = dist(`${templateDir}/${dir}/meta.json`);
 				const { position, title, description, enabled } = JSON.parse(
-					readFileSync(meta_file, 'utf8')
+					fs.readFileSync(meta_file, 'utf8')
 				);
 				if (enabled) {
 					parsedChoices.push({
@@ -247,7 +247,7 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 					});
 				}
 			})
-		parsedChoices.sort((a, b) => a.position - b.position);
+		parsedChoices.sort((a:any, b:any) => a.position - b.position);
 		const q = {
 			type: 'select',
 			name: 'skeletontemplate',
@@ -263,10 +263,12 @@ Problems? Open an issue on ${cyan('https://github.com/skeletonlabs/skeleton/issu
 	};
 
 	// Get user responses to missing args
+	//@ts-ignore
 	const response = await prompts(questions, { onCancel });
 
 	//Prompts returns the twplugins as an array, but it makes it easier to use on the command line if they are seperated booleans
 	//We map them out from the array here and delete the now useless twplugins prop before proceeding to overlay the response values onto opts
+	//@ts-ignore
 	Object.keys(response.twplugins).forEach((index) => (opts[response.twplugins[index]] = true));
 	delete response.twplugins;
 	Object.assign(opts, response)

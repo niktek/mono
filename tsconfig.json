@@ -1,5 +1,5 @@
 {
-  "include": ["cli", "www"],
+  "include": ["packages"],
   "compilerOptions": {
     /* LANGUAGE COMPILATION OPTIONS */
     "target": "ES2020",
@@ -37,7 +37,7 @@
 
     /* OTHER OPTIONS */
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     // "emitDecoratorMetadata": true,
     // "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
