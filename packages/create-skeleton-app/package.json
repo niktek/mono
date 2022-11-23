@@ -34,10 +34,18 @@
 		"bin/*"
 	],
 	"scripts": {
-		"prepublishOnly": "npm run build",
-		"dev": "tsx src/bin.ts --skeletontemplatedir=../../../template-sites/",
-		"build": "tsx scripts/copyassets.ts",
-		"release": "bumpp && npm publish"
+		"typecheck": "tsc",
+		"build": "tsup && tsx ./scripts/copyassets.ts",
+		"dev": "tsup --watch",
+		"clean": "rm -rf dist .turbo node_modules",
+		"start": "node dist/index.js",
+		"lint": "eslint src --cache --cache-strategy content",
+		"format": "prettier --write --plugin-search-dir=. **/*.{cjs,mjs,ts,tsx,md,json} --ignore-path ../.gitignore",
+		"format:check": "prettier --check --plugin-search-dir=. **/*.{cjs,mjs,ts,tsx,md,json} --ignore-path ../.gitignore",
+		"release": "changeset version",
+		"pub:beta": "pnpm build && npm publish --tag beta",
+		"pub:next": "pnpm build && npm publish --tag next",
+		"pub:release": "pnpm build && npm publish"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^9.0.13",

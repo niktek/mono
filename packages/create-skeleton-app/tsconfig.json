@@ -1,16 +1,10 @@
 {
-	"compilerOptions": {
-		"target": "es2017",
-		"module": "esnext",
-		"lib": [
-			"esnext"
-		],
-		"moduleResolution": "node",
-		"esModuleInterop": true,
-		"strict": false,
-		"strictNullChecks": false,
-		"resolveJsonModule": true,
-		"allowJs": true,
-		"noEmit": true
-	}
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  },
+  "include": ["src", ".eslintrc.cjs"]
 }
