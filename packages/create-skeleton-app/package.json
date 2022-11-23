@@ -2,50 +2,46 @@
 	"name": "create-skeleton-app",
 	"version": "0.0.6-beta.7",
 	"description": "Use this CLI app to setup a new Skeleton application in a new SvelteKit project.",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/skeletonlabs/skeleton",
-		"directory": "packages/create-skeleton-app/"
-	},
-	"homepage": "https://www.skeleton.dev",
 	"keywords": [
 		"skeleton",
 		"svelte",
 		"sveltekit",
 		"svelte-kit"
 	],
-	"author": "Skeleton Admin <admin@skeletonlabs.co>",
+	"homepage": "https://www.skeleton.dev",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/skeletonlabs/skeleton",
+		"directory": "packages/create-skeleton-app/"
+	},
 	"license": "MIT",
+	"author": "Skeleton Admin <admin@skeletonlabs.co>",
 	"type": "module",
-	"exports": {
-		".": {
-			"require": "./dist/index.cjs",
-			"import": "./dist/index.mjs"
-		}
-	},
-	"main": "./dist/index.cjs",
-	"module": "./dist/index.mjs",
-	"types": "./dist/index.d.ts",
-	"bin": {
-		"create-skeleton-app": "./bin/create-skeleton-app.mjs"
-	},
+	"exports": "./dist/index.js",
+	"bin": "./dist/index.js",
 	"files": [
-		"dist/*",
-		"bin/*"
+		"dist/**",
+		"templates/**"
 	],
+	"engines": {
+		"node": ">=14.16"
+	},
 	"scripts": {
-		"typecheck": "tsc",
 		"build": "tsup && tsx ./scripts/copyassets.ts",
-		"dev": "tsup --watch",
 		"clean": "rm -rf dist .turbo node_modules",
-		"start": "node dist/index.js",
-		"lint": "eslint src --cache --cache-strategy content",
+		"dev": "tsup --watch",
 		"format": "prettier --write --plugin-search-dir=. **/*.{cjs,mjs,ts,tsx,md,json} --ignore-path ../.gitignore",
 		"format:check": "prettier --check --plugin-search-dir=. **/*.{cjs,mjs,ts,tsx,md,json} --ignore-path ../.gitignore",
-		"release": "changeset version",
+		"lint": "eslint src --cache --cache-strategy content",
 		"pub:beta": "pnpm build && npm publish --tag beta",
 		"pub:next": "pnpm build && npm publish --tag next",
-		"pub:release": "pnpm build && npm publish"
+		"pub:release": "pnpm build && npm publish",
+		"release": "changeset version",
+		"start": "node dist/index.js",
+		"typecheck": "tsc"
+	},
+	"dependencies": {
+		"create-svelte": "2.0.0-next.191"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^9.0.13",
@@ -67,8 +63,5 @@
 		"typescript": "^4.9.3",
 		"unbuild": "^0.9.4",
 		"which-pm-runs": "^1.1.0"
-	},
-	"dependencies": {
-		"create-svelte": "2.0.0-next.191"
 	}
 }
