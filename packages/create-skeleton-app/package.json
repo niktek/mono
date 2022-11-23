@@ -1,63 +1,64 @@
 {
-	"name": "create-skeleton-app",
-	"version": "0.0.6-beta.7",
-	"description": "Use this CLI app to setup a new Skeleton application in a new SvelteKit project.",
-	"keywords": [
-		"skeleton",
-		"svelte",
-		"sveltekit",
-		"svelte-kit"
-	],
-	"homepage": "https://www.skeleton.dev",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/skeletonlabs/skeleton",
-		"directory": "packages/create-skeleton-app/"
-	},
-	"license": "MIT",
-	"author": "Skeleton Admin <admin@skeletonlabs.co>",
-	"type": "module",
-	"exports": "./dist/index.js",
-	"bin": "./dist/index.js",
-	"files": [
-		"dist/**",
-		"templates/**"
-	],
-	"engines": {
-		"node": ">=14.16"
-	},
-	"scripts": {
-		"build": "tsup && tsx ./scripts/copyAssets.ts",
-		"clean": "rm -rf dist .turbo node_modules",
-		"dev": "tsup --watch",
-		"format": "prettier --write --plugin-search-dir=. **/*.{cjs,mjs,ts,tsx,md,json} --ignore-path ../.gitignore",
-		"format:check": "prettier --check --plugin-search-dir=. **/*.{cjs,mjs,ts,tsx,md,json} --ignore-path ../.gitignore",
-		"lint": "eslint src --cache --cache-strategy content",
-		"pub:beta": "pnpm build && npm publish --tag beta",
-		"pub:next": "pnpm build && npm publish --tag next",
-		"pub:release": "pnpm build && npm publish",
-		"release": "changeset version",
-		"start": "node dist/index.js",
-		"typecheck": "tsc"
-	},
-	"dependencies": {
-		"create-svelte": "2.0.0-next.191"
-	},
-	"devDependencies": {
-		"@types/fs-extra": "^9.0.13",
-		"@types/mri": "^1.1.1",
-		"@types/prompts": "^2.4.1",
-		"bumpp": "^8.2.1",
-		"eslint": "^8.28.0",
-		"fs-extra": "^10.1.0",
-		"kleur": "^4.1.5",
-		"mri": "^1.2.0",
-		"ora": "^6.1.2",
-		"prompts": "^2.4.2",
-		"sort-package-json": "^2.1.0",
-		"standard-version": "^9.5.0",
-		"svelte": "^3.53.1",
-		"tsup": "^6.5.0",
-		"tsx": "^3.12.1"
-	}
+  "name": "create-skeleton-app",
+  "version": "0.0.6-beta.8",
+  "description": "Use this CLI app to setup a new Skeleton application in a new SvelteKit project.",
+  "keywords": [
+    "skeleton",
+    "svelte",
+    "sveltekit",
+    "svelte-kit"
+  ],
+  "homepage": "https://www.skeleton.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skeletonlabs/skeleton",
+    "directory": "packages/create-skeleton-app/"
+  },
+  "license": "MIT",
+  "author": "Skeleton Admin <admin@skeletonlabs.co>",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "bin": "./dist/index.js",
+  "files": [
+    "dist/**",
+    "templates/**"
+  ],
+  "engines": {
+    "node": ">=14.16"
+  },
+  "scripts": {
+    "build": "tsup && tsx ./scripts/copyAssets.ts",
+    "clean": "rm -rf dist .turbo node_modules",
+    "dev": "tsup --watch",
+    "format": "prettier --write --plugin-search-dir=. **/*.{cjs,mjs,ts,tsx,md,json} --ignore-path ../.gitignore",
+    "format:check": "prettier --check --plugin-search-dir=. **/*.{cjs,mjs,ts,tsx,md,json} --ignore-path ../.gitignore",
+    "lint": "eslint src --cache --cache-strategy content",
+    "pub:beta": "pnpm build && npm publish --tag beta",
+    "pub:next": "pnpm build && npm publish --tag next",
+    "pub:release": "pnpm build && npm publish",
+    "release": "changeset version",
+    "start": "node dist/index.js",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "create-svelte": "2.0.0-next.191"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.13",
+    "@types/graceful-fs": "^4.1.5",
+    "@types/mri": "^1.1.1",
+    "@types/prompts": "^2.4.1",
+    "bumpp": "^8.2.1",
+    "eslint": "^8.28.0",
+    "fs-extra": "^10.1.0",
+    "kleur": "^4.1.5",
+    "mri": "^1.2.0",
+    "ora": "^6.1.2",
+    "prompts": "^2.4.2",
+    "sort-package-json": "^2.1.0",
+    "standard-version": "^9.5.0",
+    "svelte": "^3.53.1",
+    "tsup": "^6.5.0",
+    "tsx": "^3.12.1"
+  }
 }

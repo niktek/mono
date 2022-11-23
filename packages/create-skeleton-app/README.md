@@ -9,7 +9,7 @@
 
 This is the CLI tool for setting up a new Skeleton App that uses [Skeleton](https://skeleton.dev/), [SvelteKit](https://kit.svelte.dev/) and [Tailwind CSS](https://tailwindcss.com/).
 
-`pnpm create skeleton-app` is all you need to get started.  It also supports using `npm` and `yarn` instead of `pnpm`.
+`pnpm create skeleton-app` is all you need to get started. It also supports using `npm` and `yarn` instead of `pnpm`.
 
 ## 👋 Community
 

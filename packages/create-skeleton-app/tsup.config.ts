@@ -12,5 +12,6 @@ export default defineConfig({
   sourcemap: true,
   target: "esnext",
   outDir: "dist",
+  external: ["fs-extra", "prompts"],
   onSuccess: isDev ? "node dist/index.js" : undefined,
 });
