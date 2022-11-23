@@ -8,7 +8,6 @@ import { dist, getHelpText } from './utils';
 import path from 'path';
 
 async function main() {
-	dist(".");
 	
 	// grab any passed arguments from the command line
 	let opts: SkeletonOptions = await parseArgs();
