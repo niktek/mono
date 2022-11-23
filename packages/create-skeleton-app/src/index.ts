@@ -1,10 +1,12 @@
 #!/usr/bin/env node
-import { SkeletonOptions, createSkeleton } from './creator';
-import fs from 'fs-extra';
+import { SkeletonOptions, createSkeleton } from './creator.js';
+import * as fs from 'fs-extra';
 import mri from 'mri';
+// const { mri } = _;
 import prompts from 'prompts';
+// const { prompts } = _;
 import { bold, cyan, gray, grey, red } from 'kleur/colors';
-import { dist, getHelpText } from './utils';
+import { dist, getHelpText } from './utils.js';
 import path from 'path';
 
 async function main() {

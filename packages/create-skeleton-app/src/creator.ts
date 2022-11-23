@@ -1,8 +1,8 @@
 // Types
-import { create } from 'create-svelte/types/index.js';
+import { create } from 'create-svelte';
 import process from 'process';
 import { spawnSync } from 'node:child_process';
-import * as fs from 'fs-extra';
+import fs from 'fs-extra';
 import path from 'path';
 import { dist, whichPMRuns } from './utils.js';
 import { bold, red, cyan } from 'kleur/colors';

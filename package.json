@@ -9,7 +9,7 @@
 	"packageManager": "pnpm@7.13.0",
 	"scripts": {
 		"typecheck": "turbo typecheck",
-		"build:csa": "turbo --filter=create-skeleton-app build",
+		"build:csa": "turbo --filter=packages* build",
 		"build:www": "turbo --filter=www build",
 		"build": "turbo build",
 		"start:cli": "turbo --filter=create-skeleton-app start",
